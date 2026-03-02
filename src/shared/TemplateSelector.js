@@ -152,13 +152,15 @@ export default function TemplateSelector( { value, onChange } ) {
 	};
 
 	// Site Editor link for the currently selected template part.
-	const editUrl =
-		value && currentTheme
-			? `${ adminUrl }site-editor.php` +
-			  `?postType=wp_template_part` +
-			  `&categoryId=${ MODAL_AREA }` +
-			  `&canvas=edit`
-			: null;
+	// Use the record's `id` field (e.g. "twentytwentyfour//modal-person-bio")
+	// so the Site Editor opens directly to that template part for editing.
+	const selectedPart = modalParts.find( ( part ) => part.slug === value );
+	const editUrl = selectedPart
+		? `${ adminUrl }site-editor.php` +
+		  `?postType=wp_template_part` +
+		  `&postId=${ encodeURIComponent( selectedPart.id ) }` +
+		  `&canvas=edit`
+		: null;
 
 	// ------------------------------------------------------------------ //
 	// Render                                                               //

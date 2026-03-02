@@ -1,0 +1,242 @@
+/* ==========================================================================
+   Modal Templates — Frontend Styles
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Body lock (prevent scroll when modal is open)
+   -------------------------------------------------------------------------- */
+
+.mt-modal-open {
+	overflow: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Shell (backdrop + positioner wrapper)
+   -------------------------------------------------------------------------- */
+
+#mt-modal-shell {
+	display: none; /* hidden by default; JS adds .mt-modal--open */
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+}
+
+#mt-modal-shell.mt-modal--open {
+	display: block;
+}
+
+/* --------------------------------------------------------------------------
+   Backdrop
+   -------------------------------------------------------------------------- */
+
+.mt-modal__backdrop {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	cursor: pointer;
+
+	/* Fade in */
+	animation: mt-backdrop-in 180ms ease forwards;
+}
+
+@keyframes mt-backdrop-in {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+/* --------------------------------------------------------------------------
+   Positioner — centers the dialog on screen
+   -------------------------------------------------------------------------- */
+
+.mt-modal__positioner {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+	pointer-events: none; /* clicks fall through to backdrop */
+}
+
+/* --------------------------------------------------------------------------
+   Dialog
+   -------------------------------------------------------------------------- */
+
+.mt-modal__dialog {
+	position: relative;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	max-height: calc(100dvh - 3rem);
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	pointer-events: all; /* re-enable for dialog itself */
+
+	/* Slide + fade in */
+	animation: mt-dialog-in 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mt-dialog-in {
+	from {
+		opacity: 0;
+		transform: translateY(12px) scale(0.97);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* Width variants */
+.mt-modal__dialog[data-mt-width="small"]  { max-width: 480px; }
+.mt-modal__dialog[data-mt-width="medium"] { max-width: 640px; }
+.mt-modal__dialog[data-mt-width="large"]  { max-width: 960px; }
+.mt-modal__dialog[data-mt-width="full"]   { max-width: calc(100vw - 3rem); }
+
+/* --------------------------------------------------------------------------
+   Close button
+   -------------------------------------------------------------------------- */
+
+.mt-modal__close {
+	position: absolute;
+	top: 0.75rem;
+	right: 0.75rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	background: transparent;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	font-size: 1.125rem;
+	color: #555;
+	transition: background 150ms ease, color 150ms ease;
+	z-index: 1;
+}
+
+.mt-modal__close:hover,
+.mt-modal__close:focus-visible {
+	background: #f0f0f0;
+	color: #111;
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Content area
+   -------------------------------------------------------------------------- */
+
+.mt-modal__content {
+	overflow-y: auto;
+	padding: 2rem;
+	flex: 1;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* --------------------------------------------------------------------------
+   Loading state
+   -------------------------------------------------------------------------- */
+
+.mt-modal__loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 3rem 0;
+	color: #767676;
+	font-size: 0.9rem;
+}
+
+.mt-modal__spinner {
+	display: inline-block;
+	width: 1.5rem;
+	height: 1.5rem;
+	border: 3px solid #ddd;
+	border-top-color: #555;
+	border-radius: 50%;
+	animation: mt-spin 0.7s linear infinite;
+}
+
+@keyframes mt-spin {
+	to { transform: rotate(360deg); }
+}
+
+/* --------------------------------------------------------------------------
+   Error state
+   -------------------------------------------------------------------------- */
+
+.mt-modal__error {
+	color: #d63638;
+	padding: 1rem;
+	border: 1px solid #d63638;
+	border-radius: 4px;
+	background: #fce8e8;
+}
+
+/* --------------------------------------------------------------------------
+   Trigger: wrapper / card
+   -------------------------------------------------------------------------- */
+
+.modal-trigger-wrapper--active {
+	cursor: pointer;
+}
+
+.modal-trigger-wrapper--active:focus-visible {
+	outline: 3px solid var(--wp--preset--color--primary, #007cba);
+	outline-offset: 3px;
+}
+
+/* Screen-reader-only utility (used inside the loading spinner) */
+.screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — small viewports
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+	.mt-modal__positioner {
+		align-items: flex-end;
+		padding: 0;
+	}
+
+	.mt-modal__dialog {
+		border-radius: 12px 12px 0 0;
+		max-height: 90dvh;
+		animation-name: mt-dialog-in-mobile;
+	}
+
+	@keyframes mt-dialog-in-mobile {
+		from {
+			opacity: 0;
+			transform: translateY(100%);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.mt-modal__backdrop,
+	.mt-modal__dialog {
+		animation: none;
+	}
+}

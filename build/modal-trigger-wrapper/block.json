@@ -1,0 +1,77 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "modal-templates/modal-trigger-wrapper",
+  "title": "Modal Trigger Wrapper",
+  "category": "design",
+  "icon": "layout",
+  "description": "A group of blocks that acts as a clickable card to open a modal whose content is a template part.",
+  "keywords": [
+    "modal",
+    "card",
+    "wrapper",
+    "trigger",
+    "dialog",
+    "group"
+  ],
+  "textdomain": "modal-templates",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./editor.css",
+  "style": "file:./style.css",
+  "render": "file:./render.php",
+  "attributes": {
+    "modalSlug": {
+      "type": "string",
+      "default": ""
+    },
+    "width": {
+      "type": "string",
+      "default": "medium",
+      "enum": [
+        "small",
+        "medium",
+        "large",
+        "full"
+      ]
+    },
+    "tagName": {
+      "type": "string",
+      "default": "div"
+    }
+  },
+  "supports": {
+    "html": false,
+    "color": {
+      "background": true,
+      "text": true,
+      "gradients": true
+    },
+    "typography": {
+      "fontSize": true
+    },
+    "border": {
+      "color": true,
+      "radius": true,
+      "style": true,
+      "width": true
+    },
+    "spacing": {
+      "padding": true,
+      "margin": true,
+      "blockGap": true
+    },
+    "layout": {
+      "allowSwitching": true,
+      "allowEditing": true,
+      "default": {
+        "type": "default"
+      }
+    },
+    "__experimentalSelector": ".wp-block-modal-templates-modal-trigger-wrapper"
+  },
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
+  "innerBlocks": true
+}

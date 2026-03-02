@@ -1,0 +1,14 @@
+{
+  "name": "modal-templates",
+  "version": "1.0.0",
+  "description": "Block-based modal plugin for WordPress",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "format": "wp-scripts format",
+    "lint:js": "wp-scripts lint-js"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^30.0.0"
+  }
+}

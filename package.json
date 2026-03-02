@@ -2,6 +2,18 @@
   "name": "modal-templates",
   "version": "1.0.0",
   "description": "Block-based modal plugin for WordPress",
+  "files": [
+    "assets/",
+    "build/",
+    "includes/register-blocks.php",
+    "includes/settings.php",
+    "includes/template-parts.php",
+    "languages/",
+    "modal-templates.php",
+    "readme.txt",
+    "README.md",
+    "uninstall.php"
+  ],
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
@@ -13,7 +25,8 @@
     "i18n:pot": "wp i18n make-pot . languages/modal-templates.pot --domain=modal-templates --exclude=build,node_modules,vendor",
     "i18n:mo": "wp i18n make-mo languages/",
     "i18n:json": "wp i18n make-json languages/ --no-purge",
-    "i18n": "npm run i18n:pot && npm run i18n:mo && npm run i18n:json"
+    "i18n": "npm run i18n:pot && npm run i18n:mo && npm run i18n:json",
+    "plugin-zip": "wp-scripts plugin-zip"
   },
   "devDependencies": {
     "@wordpress/scripts": "^30.0.0"

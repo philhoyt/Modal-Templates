@@ -2,21 +2,23 @@
  * TemplateSelector
  *
  * A ComboboxControl that lists all template parts in the "modal" area
- * and provides a "Create new" button that:
- *   1. Saves a new wp_template_part record with area="modal"
- *   2. Opens the Site Editor to edit it
- *   3. Updates the block's modalSlug attribute
+ * and provides a "Create new" flow that:
+ *   1. Prompts the user for a name
+ *   2. Saves a new wp_template_part record with area="modal"
+ *   3. Opens the Site Editor to edit it
+ *   4. Updates the block's modalSlug attribute
  *
  * Pattern mirrors Ollie Menu Designer's TemplateSelector / useTemplateCreation.
  */
 
-import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ComboboxControl,
 	Button,
 	Spinner,
 	BaseControl,
+	TextControl,
 	ExternalLink,
 } from '@wordpress/components';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -25,8 +27,36 @@ import { decodeEntities } from '@wordpress/html-entities';
 
 const MODAL_AREA = 'modal';
 
+/**
+ * Convert a human-readable name into a URL-safe slug prefixed with "modal-".
+ * e.g. "Person Bio" → "modal-person-bio"
+ *
+ * @param {string} name Raw user input.
+ * @return {string} Slug string.
+ */
+function nameToSlug( name ) {
+	return (
+		'modal-' +
+		name
+			.toLowerCase()
+			.trim()
+			.replace( /[^a-z0-9]+/g, '-' )
+			.replace( /^-+|-+$/g, '' )
+	);
+}
+
 export default function TemplateSelector( { value, onChange } ) {
 	const [ isCreating, setIsCreating ] = useState( false );
+	const [ showNameInput, setShowNameInput ] = useState( false );
+	const [ newName, setNewName ] = useState( '' );
+	const nameInputRef = useRef( null );
+
+	// Focus the name input as soon as it appears.
+	useEffect( () => {
+		if ( showNameInput && nameInputRef.current ) {
+			nameInputRef.current.focus();
+		}
+	}, [ showNameInput ] );
 
 	// Fetch all template parts; filter client-side for the modal area
 	// (same approach as Ollie — avoids relying on REST ?area= support).
@@ -38,8 +68,7 @@ export default function TemplateSelector( { value, onChange } ) {
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
-	// Theme stylesheet slug — needed when constructing the template part ID
-	// and when opening the Site Editor.
+	// Theme stylesheet slug — needed when opening the Site Editor.
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -63,24 +92,18 @@ export default function TemplateSelector( { value, onChange } ) {
 	// ------------------------------------------------------------------ //
 	// Create a new modal template part and open it in the Site Editor     //
 	// ------------------------------------------------------------------ //
+
 	const handleCreate = async () => {
-		if ( isCreating ) {
+		if ( isCreating || ! newName.trim() ) {
 			return;
 		}
+
+		const title = newName.trim();
+		const slug = nameToSlug( title );
+
 		setIsCreating( true );
 
 		try {
-			const timestamp = Date.now();
-			const slug = `modal-${ timestamp }`;
-			const title = sprintf(
-				/* translators: %s: auto-generated number */
-				__( 'Modal %s', 'modal-templates' ),
-				new Date().toLocaleDateString( undefined, {
-					month: 'short',
-					day: 'numeric',
-				} )
-			);
-
 			const newPart = await saveEntityRecord(
 				'postType',
 				'wp_template_part',
@@ -100,6 +123,8 @@ export default function TemplateSelector( { value, onChange } ) {
 
 			if ( newPart?.id ) {
 				onChange( newPart.slug );
+				setShowNameInput( false );
+				setNewName( '' );
 
 				// Give WordPress a moment to finish indexing the new record.
 				setTimeout( () => {
@@ -119,6 +144,11 @@ export default function TemplateSelector( { value, onChange } ) {
 		} finally {
 			setIsCreating( false );
 		}
+	};
+
+	const handleCancel = () => {
+		setShowNameInput( false );
+		setNewName( '' );
 	};
 
 	// Site Editor link for the currently selected template part.
@@ -167,30 +197,81 @@ export default function TemplateSelector( { value, onChange } ) {
 				</p>
 			) }
 
-			<div
-				style={ {
-					display: 'flex',
-					gap: '8px',
-					marginTop: '8px',
-					flexWrap: 'wrap',
-				} }
-			>
-				<Button
-					variant="secondary"
-					size="small"
-					isBusy={ isCreating }
-					disabled={ isCreating }
-					onClick={ handleCreate }
+			{ showNameInput ? (
+				<div style={ { marginTop: '8px' } }>
+					<TextControl
+						ref={ nameInputRef }
+						label={ __( 'Template name', 'modal-templates' ) }
+						value={ newName }
+						placeholder={ __(
+							'e.g. Person Bio',
+							'modal-templates'
+						) }
+						onChange={ setNewName }
+						onKeyDown={ ( e ) => {
+							if ( e.key === 'Enter' ) {
+								handleCreate();
+							} else if ( e.key === 'Escape' ) {
+								handleCancel();
+							}
+						} }
+						help={
+							newName.trim()
+								? `slug: ${ nameToSlug( newName ) }`
+								: undefined
+						}
+						__nextHasNoMarginBottom
+					/>
+					<div
+						style={ {
+							display: 'flex',
+							gap: '8px',
+							marginTop: '8px',
+						} }
+					>
+						<Button
+							variant="primary"
+							size="small"
+							isBusy={ isCreating }
+							disabled={ isCreating || ! newName.trim() }
+							onClick={ handleCreate }
+						>
+							{ __( 'Create', 'modal-templates' ) }
+						</Button>
+						<Button
+							variant="tertiary"
+							size="small"
+							disabled={ isCreating }
+							onClick={ handleCancel }
+						>
+							{ __( 'Cancel', 'modal-templates' ) }
+						</Button>
+					</div>
+				</div>
+			) : (
+				<div
+					style={ {
+						display: 'flex',
+						gap: '8px',
+						marginTop: '8px',
+						flexWrap: 'wrap',
+					} }
 				>
-					{ __( '+ New modal template', 'modal-templates' ) }
-				</Button>
+					<Button
+						variant="secondary"
+						size="small"
+						onClick={ () => setShowNameInput( true ) }
+					>
+						{ __( '+ New modal template', 'modal-templates' ) }
+					</Button>
 
-				{ value && editUrl && (
-					<ExternalLink href={ editUrl }>
-						{ __( 'Edit in Site Editor', 'modal-templates' ) }
-					</ExternalLink>
-				) }
-			</div>
+					{ value && editUrl && (
+						<ExternalLink href={ editUrl }>
+							{ __( 'Edit in Site Editor', 'modal-templates' ) }
+						</ExternalLink>
+					) }
+				</div>
+			) }
 		</BaseControl>
 	);
 }

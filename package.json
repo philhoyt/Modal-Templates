@@ -9,7 +9,11 @@
     "lint:js": "wp-scripts lint-js src/ assets/js/ webpack.config.js",
     "lint:css": "wp-scripts lint-style assets/css/ src/**/*.css",
     "lint:php": "composer run-script lint",
-    "lint": "npm run lint:js && npm run lint:css && composer run-script lint"
+    "lint": "npm run lint:js && npm run lint:css && composer run-script lint",
+    "i18n:pot": "wp i18n make-pot . languages/modal-templates.pot --domain=modal-templates --exclude=build,node_modules,vendor",
+    "i18n:mo": "wp i18n make-mo languages/",
+    "i18n:json": "wp i18n make-json languages/ --no-purge",
+    "i18n": "npm run i18n:pot && npm run i18n:mo && npm run i18n:json"
   },
   "devDependencies": {
     "@wordpress/scripts": "^30.0.0"

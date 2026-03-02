@@ -55,7 +55,7 @@ addFilter(
 				modalWidth: {
 					type: 'string',
 					default: 'medium',
-					enum: [ 'small', 'medium', 'large', 'full' ],
+					enum: [ 'small', 'medium', 'large', 'full', 'custom' ],
 				},
 			},
 		};

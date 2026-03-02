@@ -59,6 +59,12 @@ function modal_templates_enqueue_editor_assets(): void {
 			'adminUrl' => esc_url_raw( admin_url() ),
 		)
 	);
+
+	wp_set_script_translations(
+		'modal-templates-editor',
+		'modal-templates',
+		MODAL_TEMPLATES_DIR . 'languages'
+	);
 }
 
 /**

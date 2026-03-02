@@ -146,6 +146,9 @@
 		lastTrigger = triggerEl;
 		const s = getShell();
 
+		// Cancel any in-progress close animation.
+		s.classList.remove( 'mt-modal--closing' );
+
 		// Width variant.
 		s.querySelector( '[data-mt-dialog]' ).dataset.mtWidth = width;
 
@@ -191,10 +194,13 @@
 			return;
 		}
 
-		shell.setAttribute( 'aria-hidden', 'true' );
-		shell.classList.remove( 'mt-modal--open' );
+		// Pause any playing media before the exit animation begins.
+		shell.querySelectorAll( 'video, audio' ).forEach( function ( el ) {
+			el.pause();
+		} );
 
-		// Restore scroll + background access.
+		// Update ARIA + restore page state immediately — don't wait for animation.
+		shell.setAttribute( 'aria-hidden', 'true' );
 		unlockScroll();
 		setBackgroundInert( false );
 
@@ -203,6 +209,23 @@
 			lastTrigger.focus();
 			lastTrigger = null;
 		}
+
+		// Play exit animation, then fully hide the shell.
+		shell.classList.remove( 'mt-modal--open' );
+		shell.classList.add( 'mt-modal--closing' );
+
+		const dialog = shell.querySelector( '[data-mt-dialog]' );
+
+		// Timeout fallback covers reduced-motion (animationend never fires).
+		const timer = setTimeout( function () {
+			shell.classList.remove( 'mt-modal--closing' );
+		}, 300 );
+
+		dialog.addEventListener( 'animationend', function handler() {
+			clearTimeout( timer );
+			shell.classList.remove( 'mt-modal--closing' );
+			dialog.removeEventListener( 'animationend', handler );
+		} );
 	}
 
 	/* ------------------------------------------------------------------ */

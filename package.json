@@ -8,7 +8,6 @@
     "includes/register-blocks.php",
     "includes/settings.php",
     "includes/template-parts.php",
-    "languages/",
     "modal-templates.php",
     "readme.txt",
     "README.md",

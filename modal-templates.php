@@ -20,19 +20,6 @@ define( 'MODAL_TEMPLATES_VERSION', '1.0.0' );
 define( 'MODAL_TEMPLATES_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MODAL_TEMPLATES_URL', plugin_dir_url( __FILE__ ) );
 
-add_action( 'init', 'modal_templates_load_textdomain' );
-
-/**
- * Load the plugin text domain for translations.
- */
-function modal_templates_load_textdomain(): void {
-	load_plugin_textdomain(
-		'modal-templates',
-		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages'
-	);
-}
-
 require_once MODAL_TEMPLATES_DIR . 'includes/template-parts.php';
 require_once MODAL_TEMPLATES_DIR . 'includes/register-blocks.php';
 require_once MODAL_TEMPLATES_DIR . 'includes/settings.php';

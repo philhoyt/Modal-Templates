@@ -1,0 +1,216 @@
+# Copyright (C) 2026 philhoyt
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Modal Templates 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/Modal-Templates\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-03-02T19:15:33+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: modal-templates\n"
+
+#. Plugin Name of the plugin
+#: modal-templates.php
+#: includes/settings.php:73
+#: includes/settings.php:74
+#: includes/settings.php:248
+msgid "Modal Templates"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: modal-templates.php
+msgid "https://github.com/philhoyt/Modal-Templates"
+msgstr ""
+
+#. Description of the plugin
+#: modal-templates.php
+msgid "Block-based modals driven by template parts. Design modal contents in the Site Editor and attach them to button or card triggers—works inside Query Loops."
+msgstr ""
+
+#. Author of the plugin
+#: modal-templates.php
+msgid "philhoyt"
+msgstr ""
+
+#. Author URI of the plugin
+#: modal-templates.php
+msgid "https://philhoyt.com"
+msgstr ""
+
+#: includes/settings.php:62
+msgid "Settings"
+msgstr ""
+
+#: includes/settings.php:250
+msgid "Customise the modal appearance. Developers can also override any value directly in theme CSS using the custom property name shown beneath each field."
+msgstr ""
+
+#: includes/settings.php:256
+msgid "Backdrop"
+msgstr ""
+
+#: includes/settings.php:261
+msgid "Colour"
+msgstr ""
+
+#: includes/settings.php:278
+msgid "Opacity"
+msgstr ""
+
+#: includes/settings.php:296
+msgid "Colour + opacity combine to form"
+msgstr ""
+
+#: includes/settings.php:303
+msgid "Dialog"
+msgstr ""
+
+#: includes/settings.php:308
+msgid "Background colour"
+msgstr ""
+
+#: includes/settings.php:326
+msgid "Border radius"
+msgstr ""
+
+#: includes/settings.php:346
+msgid "Content padding"
+msgstr ""
+
+#: includes/settings.php:370
+msgid "Custom width"
+msgstr ""
+
+#: includes/settings.php:385
+msgid "Used when \"Custom (set in Settings)\" is selected as the modal width in the block editor."
+msgstr ""
+
+#: includes/settings.php:392
+msgid "Close button"
+msgstr ""
+
+#: includes/settings.php:397
+msgid "Icon colour"
+msgstr ""
+
+#: includes/settings.php:414
+msgid "Developer-only properties"
+msgstr ""
+
+#: includes/settings.php:416
+msgid "These values can only be set via theme CSS. Add them to your theme's stylesheet or the Additional CSS panel in the Customiser."
+msgstr ""
+
+#: includes/settings.php:420
+msgid "Box shadow"
+msgstr ""
+
+#: includes/settings.php:424
+msgid "Close button hover background"
+msgstr ""
+
+#: includes/settings.php:425
+msgid "(default: #f0f0f0)"
+msgstr ""
+
+#: includes/settings.php:428
+msgid "Z-index"
+msgstr ""
+
+#: includes/settings.php:429
+msgid "(default: 99999)"
+msgstr ""
+
+#: includes/template-parts.php:23
+#: src/modal-button/index.js:83
+msgid "Modal"
+msgstr ""
+
+#: includes/template-parts.php:24
+msgid "Template parts used as modal content, selectable from Modal Trigger blocks."
+msgstr ""
+
+#: src/modal-button/index.js:25
+msgid "Small (480px)"
+msgstr ""
+
+#: src/modal-button/index.js:26
+msgid "Medium (640px)"
+msgstr ""
+
+#: src/modal-button/index.js:27
+msgid "Large (960px)"
+msgstr ""
+
+#: src/modal-button/index.js:28
+msgid "Full (100%)"
+msgstr ""
+
+#: src/modal-button/index.js:30
+msgid "Custom (set in Settings)"
+msgstr ""
+
+#: src/modal-button/index.js:94
+msgid "Modal width"
+msgstr ""
+
+#: src/modal-button/index.js:122
+msgid "Modal Trigger Button"
+msgstr ""
+
+#: src/modal-button/index.js:123
+msgid "A button that opens a modal containing a template part."
+msgstr ""
+
+#: src/modal-button/index.js:133
+msgid "Modal Trigger Group"
+msgstr ""
+
+#: src/modal-button/index.js:134
+msgid "A group of blocks that opens a modal when clicked."
+msgstr ""
+
+#: src/shared/TemplateSelector.js:118
+msgid "Modal content goes here."
+msgstr ""
+
+#: src/shared/TemplateSelector.js:177
+msgid "Modal Template Part"
+msgstr ""
+
+#: src/shared/TemplateSelector.js:181
+msgid "The selected template part is rendered inside the modal when this trigger is clicked."
+msgstr ""
+
+#: src/shared/TemplateSelector.js:195
+msgid "No modal template parts found. Create one below."
+msgstr ""
+
+#: src/shared/TemplateSelector.js:206
+msgid "Template name"
+msgstr ""
+
+#: src/shared/TemplateSelector.js:208
+msgid "e.g. Modal Content"
+msgstr ""
+
+#: src/shared/TemplateSelector.js:241
+msgid "Create"
+msgstr ""
+
+#: src/shared/TemplateSelector.js:249
+msgid "Cancel"
+msgstr ""
+
+#: src/shared/TemplateSelector.js:267
+msgid "+ New modal template"
+msgstr ""
+
+#: src/shared/TemplateSelector.js:272
+msgid "Edit in Site Editor"
+msgstr ""

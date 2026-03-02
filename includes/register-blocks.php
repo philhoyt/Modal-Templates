@@ -1,6 +1,6 @@
 <?php
 /**
- * Register Modal Templates blocks, enqueue assets, and extend core/button.
+ * Register Modal Templates blocks, enqueue assets, and extend core/button + core/group.
  *
  * @package modal-templates
  */
@@ -10,16 +10,13 @@ defined( 'ABSPATH' ) || exit;
 add_action( 'init', 'modal_templates_register_blocks' );
 add_action( 'wp_enqueue_scripts', 'modal_templates_enqueue_frontend_assets' );
 add_action( 'enqueue_block_editor_assets', 'modal_templates_enqueue_editor_assets' );
-add_filter( 'render_block', 'modal_templates_filter_core_button', 10, 2 );
+add_filter( 'render_block', 'modal_templates_filter_modal_block', 10, 2 );
 
 /**
- * Register the Modal Trigger Wrapper block.
- * The core/button extension is handled entirely in JS (addFilter) + the
- * render_block filter below — no block.json registration needed for it.
+ * No custom blocks to register — both triggers (button and group) are
+ * handled entirely via JS addFilter + the render_block PHP filter below.
  */
-function modal_templates_register_blocks(): void {
-	register_block_type( MODAL_TEMPLATES_DIR . 'build/modal-trigger-wrapper' );
-}
+function modal_templates_register_blocks(): void {}
 
 /**
  * Enqueue the frontend modal stylesheet and script.
@@ -42,9 +39,7 @@ function modal_templates_enqueue_frontend_assets(): void {
 }
 
 /**
- * Enqueue the block-editor extension for core/button.
- * This registers the JS filters that add modalSlug/modalWidth attributes
- * and inject the "Modal" inspector panel into core/button.
+ * Enqueue the block-editor extensions for core/button and core/group.
  */
 function modal_templates_enqueue_editor_assets(): void {
 	$asset_file = require MODAL_TEMPLATES_DIR . 'build/modal-button/index.asset.php';
@@ -57,8 +52,6 @@ function modal_templates_enqueue_editor_assets(): void {
 		true
 	);
 
-	// Provide admin URL (mirrors Ollie's menuDesignerData pattern) so the
-	// TemplateSelector can build Site Editor links without guessing.
 	wp_localize_script(
 		'modal-templates-editor',
 		'modalTemplatesData',
@@ -69,20 +62,18 @@ function modal_templates_enqueue_editor_assets(): void {
 }
 
 /**
- * Intercept core/button rendering when a modalSlug is set.
+ * Intercept core/button and core/group rendering when a modalSlug is set.
  *
- * Adds data attributes to the inner <a>/<button> element and appends a
- * hidden <template> element containing the pre-rendered modal content.
- * The frontend JS clones that template into the modal shell on click.
- *
- * Uses WP_HTML_Tag_Processor for safe, selector-based attribute injection.
+ * Adds data attributes to the trigger element and appends a hidden <template>
+ * element containing the pre-rendered modal content. The frontend JS clones
+ * that template into the modal shell on click.
  *
  * @param string $block_content Rendered HTML.
  * @param array  $block         Block data array (name, attrs, innerBlocks).
  * @return string
  */
-function modal_templates_filter_core_button( string $block_content, array $block ): string {
-	if ( 'core/button' !== $block['blockName'] ) {
+function modal_templates_filter_modal_block( string $block_content, array $block ): string {
+	if ( ! in_array( $block['blockName'], array( 'core/button', 'core/group' ), true ) ) {
 		return $block_content;
 	}
 
@@ -99,21 +90,23 @@ function modal_templates_filter_core_button( string $block_content, array $block
 	$content_id = 'mt-tpl-' . wp_unique_id();
 
 	// ------------------------------------------------------------------ //
-	// Add data attributes to the inner link/button                        //
+	// Inject data attributes onto the trigger element                     //
 	// ------------------------------------------------------------------ //
 
 	$processor = new WP_HTML_Tag_Processor( $block_content );
 
-	while ( $processor->next_tag() ) {
-		$class = $processor->get_attribute( 'class' ) ?? '';
-		if ( str_contains( $class, 'wp-block-button__link' ) ) {
-			$processor->set_attribute( 'data-modal-content-id', $content_id );
-			$processor->set_attribute( 'data-modal-width', $modal_width );
-			$processor->set_attribute( 'aria-haspopup', 'dialog' );
-			// Suppress default link navigation — JS handles the click.
-			$processor->set_attribute( 'role', 'button' );
-			break;
+	if ( 'core/button' === $block['blockName'] ) {
+		// Target the inner link/button element inside the wrapper div.
+		while ( $processor->next_tag() ) {
+			if ( str_contains( $processor->get_attribute( 'class' ) ?? '', 'wp-block-button__link' ) ) {
+				modal_templates_set_trigger_attributes( $processor, $content_id, $modal_width );
+				break;
+			}
 		}
+	} else {
+		// core/group — target the first (outer wrapper) element.
+		$processor->next_tag();
+		modal_templates_set_trigger_attributes( $processor, $content_id, $modal_width );
 	}
 
 	$modified = $processor->get_updated_html();
@@ -129,8 +122,27 @@ function modal_templates_filter_core_button( string $block_content, array $block
 	$modified .= sprintf(
 		'<template id="%s" class="mt-modal-prerendered">%s</template>',
 		esc_attr( $content_id ),
-		$template_html // Already processed by do_blocks inside block_template_part.
+		$template_html
 	);
 
 	return $modified;
+}
+
+/**
+ * Set the modal trigger data attributes on a WP_HTML_Tag_Processor tag.
+ *
+ * @param WP_HTML_Tag_Processor $processor  Tag processor instance, positioned on the target tag.
+ * @param string                $content_id Unique ID linking this trigger to its <template>.
+ * @param string                $modal_width Modal dialog width variant.
+ */
+function modal_templates_set_trigger_attributes(
+	WP_HTML_Tag_Processor $processor,
+	string $content_id,
+	string $modal_width
+): void {
+	$processor->set_attribute( 'data-modal-content-id', $content_id );
+	$processor->set_attribute( 'data-modal-width', $modal_width );
+	$processor->set_attribute( 'aria-haspopup', 'dialog' );
+	$processor->set_attribute( 'role', 'button' );
+	$processor->set_attribute( 'tabindex', '0' );
 }

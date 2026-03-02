@@ -1,11 +1,10 @@
 /**
- * Modal Templates — core/button extension
+ * Modal Templates — block editor extensions
  *
- * Rather than shipping a parallel button block, we extend core/button with:
- *   1. Two extra attributes: modalSlug, modalWidth
- *   2. A "Modal Settings" inspector panel (rendered for all core/button blocks
- *      so the user can opt-in to modal behaviour on any button)
- *   3. A block variation "Modal Trigger Button" for quick insertion
+ * Extends core/button and core/group with modal trigger behaviour:
+ *   1. Adds modalSlug + modalWidth attributes to both blocks
+ *   2. Injects a "Modal" inspector panel into both blocks
+ *   3. Registers block variations for quick insertion
  *
  * On the PHP side a render_block filter reads modalSlug and injects the
  * data attributes + pre-rendered <template> element that the frontend JS
@@ -20,15 +19,24 @@ import { PanelBody, SelectControl } from '@wordpress/components';
 import { registerBlockVariation } from '@wordpress/blocks';
 import TemplateSelector from '../shared/TemplateSelector';
 
+const MODAL_BLOCKS = [ 'core/button', 'core/group' ];
+
+const widthOptions = [
+	{ label: __( 'Small (480px)', 'modal-templates' ), value: 'small' },
+	{ label: __( 'Medium (640px)', 'modal-templates' ), value: 'medium' },
+	{ label: __( 'Large (960px)', 'modal-templates' ), value: 'large' },
+	{ label: __( 'Full (100%)', 'modal-templates' ), value: 'full' },
+];
+
 /* ------------------------------------------------------------------ */
-/* 1. Add modalSlug + modalWidth attributes to core/button             */
+/* 1. Add modalSlug + modalWidth attributes to core/button + core/group */
 /* ------------------------------------------------------------------ */
 
 addFilter(
 	'blocks.registerBlockType',
-	'modal-templates/button-attributes',
+	'modal-templates/modal-attributes',
 	( settings, name ) => {
-		if ( name !== 'core/button' ) {
+		if ( ! MODAL_BLOCKS.includes( name ) ) {
 			return settings;
 		}
 
@@ -51,19 +59,12 @@ addFilter(
 );
 
 /* ------------------------------------------------------------------ */
-/* 2. Inject "Modal Settings" inspector panel into core/button         */
+/* 2. Inject "Modal" inspector panel into core/button + core/group     */
 /* ------------------------------------------------------------------ */
-
-const widthOptions = [
-	{ label: __( 'Small (480px)', 'modal-templates' ), value: 'small' },
-	{ label: __( 'Medium (640px)', 'modal-templates' ), value: 'medium' },
-	{ label: __( 'Large (960px)', 'modal-templates' ), value: 'large' },
-	{ label: __( 'Full (100%)', 'modal-templates' ), value: 'full' },
-];
 
 const withModalInspector = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		if ( props.name !== 'core/button' ) {
+		if ( ! MODAL_BLOCKS.includes( props.name ) ) {
 			return <BlockEdit { ...props } />;
 		}
 
@@ -73,7 +74,6 @@ const withModalInspector = createHigherOrderComponent( ( BlockEdit ) => {
 		return (
 			<>
 				<BlockEdit { ...props } />
-
 				<InspectorControls>
 					<PanelBody
 						title={ __( 'Modal', 'modal-templates' ) }
@@ -85,7 +85,6 @@ const withModalInspector = createHigherOrderComponent( ( BlockEdit ) => {
 								setAttributes( { modalSlug: value } )
 							}
 						/>
-
 						{ modalSlug && (
 							<SelectControl
 								label={ __( 'Modal width', 'modal-templates' ) }
@@ -106,12 +105,12 @@ const withModalInspector = createHigherOrderComponent( ( BlockEdit ) => {
 
 addFilter(
 	'editor.BlockEdit',
-	'modal-templates/button-inspector',
+	'modal-templates/modal-inspector',
 	withModalInspector
 );
 
 /* ------------------------------------------------------------------ */
-/* 3. Block variation: "Modal Trigger Button"                          */
+/* 3. Block variations                                                  */
 /* ------------------------------------------------------------------ */
 
 registerBlockVariation( 'core/button', {
@@ -122,7 +121,16 @@ registerBlockVariation( 'core/button', {
 		'modal-templates'
 	),
 	icon: 'admin-page',
-	// isActive is checked when loading existing blocks to decide which
-	// variation label / icon to show in the toolbar.
+	isActive: ( blockAttributes ) => !! blockAttributes.modalSlug,
+} );
+
+registerBlockVariation( 'core/group', {
+	name: 'modal-templates/modal-trigger-group',
+	title: __( 'Modal Trigger Group', 'modal-templates' ),
+	description: __(
+		'A group of blocks that opens a modal when clicked.',
+		'modal-templates'
+	),
+	icon: 'admin-page',
 	isActive: ( blockAttributes ) => !! blockAttributes.modalSlug,
 } );

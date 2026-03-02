@@ -6,7 +6,10 @@
     "build": "wp-scripts build",
     "start": "wp-scripts start",
     "format": "wp-scripts format",
-    "lint:js": "wp-scripts lint-js"
+    "lint:js": "wp-scripts lint-js src/ assets/js/ webpack.config.js",
+    "lint:css": "wp-scripts lint-style assets/css/ src/**/*.css",
+    "lint:php": "composer run-script lint",
+    "lint": "npm run lint:js && npm run lint:css && composer run-script lint"
   },
   "devDependencies": {
     "@wordpress/scripts": "^30.0.0"

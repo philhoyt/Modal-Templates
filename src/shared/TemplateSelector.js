@@ -29,7 +29,7 @@ const MODAL_AREA = 'modal';
 
 /**
  * Convert a human-readable name into a URL-safe slug prefixed with "modal-".
- * e.g. "Person Bio" → "modal-person-bio"
+ * e.g. "Modal Content" → "modal-content"
  *
  * @param {string} name Raw user input.
  * @return {string} Slug string.
@@ -152,7 +152,7 @@ export default function TemplateSelector( { value, onChange } ) {
 	};
 
 	// Site Editor link for the currently selected template part.
-	// Use the record's `id` field (e.g. "twentytwentyfour//modal-person-bio")
+	// Use the record's `id` field (e.g. "twentytwentyfour//modal-content")
 	// so the Site Editor opens directly to that template part for editing.
 	const selectedPart = modalParts.find( ( part ) => part.slug === value );
 	const editUrl = selectedPart
@@ -206,7 +206,7 @@ export default function TemplateSelector( { value, onChange } ) {
 						label={ __( 'Template name', 'modal-templates' ) }
 						value={ newName }
 						placeholder={ __(
-							'e.g. Person Bio',
+							'e.g. Modal Content',
 							'modal-templates'
 						) }
 						onChange={ setNewName }

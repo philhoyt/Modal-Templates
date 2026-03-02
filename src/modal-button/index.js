@@ -26,6 +26,10 @@ const widthOptions = [
 	{ label: __( 'Medium (640px)', 'modal-templates' ), value: 'medium' },
 	{ label: __( 'Large (960px)', 'modal-templates' ), value: 'large' },
 	{ label: __( 'Full (100%)', 'modal-templates' ), value: 'full' },
+	{
+		label: __( 'Custom (set in Settings)', 'modal-templates' ),
+		value: 'custom',
+	},
 ];
 
 /* ------------------------------------------------------------------ */

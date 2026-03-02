@@ -83,7 +83,7 @@ function modal_templates_filter_modal_block( string $block_content, array $block
 	}
 
 	$modal_width_raw = $block['attrs']['modalWidth'] ?? 'medium';
-	$modal_width     = in_array( $modal_width_raw, array( 'small', 'medium', 'large', 'full' ), true )
+	$modal_width     = in_array( $modal_width_raw, array( 'small', 'medium', 'large', 'full', 'custom' ), true )
 		? $modal_width_raw
 		: 'medium';
 

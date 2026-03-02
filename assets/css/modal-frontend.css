@@ -3,6 +3,25 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
+   CSS custom properties — design tokens
+
+   Override any of these in your theme CSS to customise the modal appearance.
+   Site admins can adjust the most common values via Settings > Modal Templates.
+   -------------------------------------------------------------------------- */
+
+:root {
+	--mt-backdrop-color: rgba(0, 0, 0, 0.6);
+	--mt-dialog-bg: #fff;
+	--mt-dialog-radius: 8px;
+	--mt-dialog-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	--mt-dialog-padding: 2rem;
+	--mt-dialog-width-custom: 800px;
+	--mt-close-color: #555;
+	--mt-close-bg-hover: #f0f0f0;
+	--mt-z-index: 99999;
+}
+
+/* --------------------------------------------------------------------------
    Triggers
    -------------------------------------------------------------------------- */
 
@@ -18,7 +37,7 @@
 	display: none; /* hidden by default; JS adds .mt-modal--open */
 	position: fixed;
 	inset: 0;
-	z-index: 99999;
+	z-index: var(--mt-z-index);
 }
 
 #mt-modal-shell.mt-modal--open {
@@ -32,7 +51,7 @@
 .mt-modal__backdrop {
 	position: fixed;
 	inset: 0;
-	background-color: rgba(0, 0, 0, 0.6);
+	background-color: var(--mt-backdrop-color);
 	cursor: pointer;
 
 	/* Fade in */
@@ -66,9 +85,9 @@
 
 .mt-modal__dialog {
 	position: relative;
-	background: #fff;
-	border-radius: 8px;
-	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+	background: var(--mt-dialog-bg);
+	border-radius: var(--mt-dialog-radius);
+	box-shadow: var(--mt-dialog-shadow);
 	max-height: calc(100dvh - 3rem);
 	width: 100%;
 	display: flex;
@@ -101,6 +120,8 @@
 
 .mt-modal__dialog[data-mt-width="full"]   { max-width: calc(100vw - 3rem); }
 
+.mt-modal__dialog[data-mt-width="custom"] { max-width: var(--mt-dialog-width-custom); }
+
 /* --------------------------------------------------------------------------
    Close button
    -------------------------------------------------------------------------- */
@@ -119,14 +140,14 @@
 	border-radius: 50%;
 	cursor: pointer;
 	font-size: 1.125rem;
-	color: #555;
+	color: var(--mt-close-color);
 	transition: background 150ms ease, color 150ms ease;
 	z-index: 1;
 }
 
 .mt-modal__close:hover,
 .mt-modal__close:focus-visible {
-	background: #f0f0f0;
+	background: var(--mt-close-bg-hover);
 	color: #111;
 	outline: 2px solid currentcolor;
 	outline-offset: 2px;
@@ -138,7 +159,7 @@
 
 .mt-modal__content {
 	overflow-y: auto;
-	padding: 2rem;
+	padding: var(--mt-dialog-padding);
 	flex: 1;
 	-webkit-overflow-scrolling: touch;
 }
@@ -155,7 +176,7 @@
 	}
 
 	.mt-modal__dialog {
-		border-radius: 12px 12px 0 0;
+		border-radius: var(--mt-dialog-radius) var(--mt-dialog-radius) 0 0;
 		max-height: 90dvh;
 		animation-name: mt-dialog-in-mobile;
 	}

@@ -21,3 +21,4 @@ define( 'MODAL_TEMPLATES_URL', plugin_dir_url( __FILE__ ) );
 
 require_once MODAL_TEMPLATES_DIR . 'includes/template-parts.php';
 require_once MODAL_TEMPLATES_DIR . 'includes/register-blocks.php';
+require_once MODAL_TEMPLATES_DIR . 'includes/settings.php';

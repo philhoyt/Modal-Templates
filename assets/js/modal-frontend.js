@@ -4,9 +4,14 @@
  * Opens / closes the modal shell and clones pre-rendered template-part
  * content (stored in inert <template> elements on the page) into it.
  *
- * No AJAX required — content is server-rendered alongside each trigger,
- * which means it works correctly inside Query Loops: each card's <template>
- * already contains that specific post's data.
+ * Accessibility features:
+ *  - role="dialog" + aria-modal="true" + aria-labelledby (dynamic, from heading)
+ *  - inert on all background content when modal is open (NVDA/FF compat)
+ *  - Focus trap (Tab wrapping) + focus return to trigger on close
+ *  - ESC to close, backdrop click to close
+ *  - aria-expanded state on triggers
+ *  - iOS scroll lock (fixed-position body trick)
+ *  - Scroll position reset on each open
  */
 
 ( function () {
@@ -32,6 +37,7 @@
 
 	let shell = null; // Single shared modal shell appended to <body>.
 	let lastTrigger = null; // Element that opened the modal (for focus return).
+	let scrollY = 0; // Saved scroll position for iOS scroll lock.
 
 	/* ------------------------------------------------------------------ */
 	/* Shell bootstrap                                                      */
@@ -47,6 +53,7 @@
 		shell.setAttribute( 'role', 'dialog' );
 		shell.setAttribute( 'aria-modal', 'true' );
 		shell.setAttribute( 'aria-hidden', 'true' );
+		shell.setAttribute( 'aria-label', 'Modal' );
 		shell.setAttribute( 'tabindex', '-1' );
 		shell.innerHTML = `
 			<div class="mt-modal__backdrop" data-mt-backdrop></div>
@@ -77,6 +84,49 @@
 	}
 
 	/* ------------------------------------------------------------------ */
+	/* Scroll lock (works on iOS Safari)                                   */
+	/* ------------------------------------------------------------------ */
+
+	function lockScroll() {
+		scrollY = window.pageYOffset;
+		document.body.style.position = 'fixed';
+		document.body.style.top = `-${ scrollY }px`;
+		document.body.style.width = '100%';
+	}
+
+	function unlockScroll() {
+		document.body.style.removeProperty( 'position' );
+		document.body.style.removeProperty( 'top' );
+		document.body.style.removeProperty( 'width' );
+		window.scrollTo( 0, scrollY );
+	}
+
+	/* ------------------------------------------------------------------ */
+	/* Background inert                                                     */
+	/* ------------------------------------------------------------------ */
+
+	/**
+	 * Apply or remove the `inert` attribute on every direct child of <body>
+	 * except the modal shell. This prevents keyboard and screen-reader users
+	 * from reaching background content while the modal is open — more
+	 * reliable than aria-modal alone (e.g. NVDA + Firefox).
+	 *
+	 * @param {boolean} active
+	 */
+	function setBackgroundInert( active ) {
+		Array.from( document.body.children ).forEach( ( el ) => {
+			if ( el === shell ) {
+				return;
+			}
+			if ( active ) {
+				el.setAttribute( 'inert', '' );
+			} else {
+				el.removeAttribute( 'inert' );
+			}
+		} );
+	}
+
+	/* ------------------------------------------------------------------ */
 	/* Open / close                                                         */
 	/* ------------------------------------------------------------------ */
 
@@ -88,7 +138,6 @@
 			return;
 		}
 
-		// Find the pre-rendered <template> element.
 		const tpl = document.getElementById( contentId );
 		if ( ! tpl ) {
 			return;
@@ -97,18 +146,38 @@
 		lastTrigger = triggerEl;
 		const s = getShell();
 
-		// Set width.
+		// Width variant.
 		s.querySelector( '[data-mt-dialog]' ).dataset.mtWidth = width;
 
-		// Clone template content into the modal's content area.
+		// Clone template content and reset scroll position.
 		const contentEl = s.querySelector( '[data-mt-content]' );
 		contentEl.innerHTML = '';
 		contentEl.appendChild( tpl.content.cloneNode( true ) );
+		contentEl.scrollTop = 0;
 
-		// Open.
+		// aria-labelledby: point dialog at the first heading in the content.
+		const heading = contentEl.querySelector( 'h1, h2, h3, h4, h5, h6' );
+		if ( heading ) {
+			if ( ! heading.id ) {
+				heading.id = 'mt-modal-heading';
+			}
+			s.setAttribute( 'aria-labelledby', heading.id );
+			s.removeAttribute( 'aria-label' );
+		} else {
+			s.removeAttribute( 'aria-labelledby' );
+			s.setAttribute( 'aria-label', 'Modal' );
+		}
+
+		// Reflect open state on the trigger.
+		triggerEl.setAttribute( 'aria-expanded', 'true' );
+
+		// Open shell.
 		s.setAttribute( 'aria-hidden', 'false' );
 		s.classList.add( 'mt-modal--open' );
-		document.body.classList.add( 'mt-modal-open' );
+
+		// Lock scroll + inert background.
+		lockScroll();
+		setBackgroundInert( true );
 
 		// Move focus to first focusable element inside the dialog.
 		window.requestAnimationFrame( () => {
@@ -118,15 +187,19 @@
 	}
 
 	function closeModal() {
-		if ( ! shell ) {
+		if ( ! shell || ! shell.classList.contains( 'mt-modal--open' ) ) {
 			return;
 		}
 
 		shell.setAttribute( 'aria-hidden', 'true' );
 		shell.classList.remove( 'mt-modal--open' );
-		document.body.classList.remove( 'mt-modal-open' );
+
+		// Restore scroll + background access.
+		unlockScroll();
+		setBackgroundInert( false );
 
 		if ( lastTrigger ) {
+			lastTrigger.setAttribute( 'aria-expanded', 'false' );
 			lastTrigger.focus();
 			lastTrigger = null;
 		}
@@ -152,6 +225,7 @@
 			const focusable = Array.from(
 				dialog.querySelectorAll( FOCUSABLE )
 			);
+
 			if ( focusable.length === 0 ) {
 				e.preventDefault();
 				return;
@@ -185,6 +259,12 @@
 					return;
 				}
 				el.dataset.mtBound = '1';
+
+				// Ensure static aria attributes are present.
+				el.setAttribute( 'aria-controls', 'mt-modal-shell' );
+				if ( ! el.hasAttribute( 'aria-expanded' ) ) {
+					el.setAttribute( 'aria-expanded', 'false' );
+				}
 
 				el.addEventListener( 'click', () => openModal( el ) );
 				el.addEventListener( 'keydown', ( e ) => {

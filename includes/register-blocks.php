@@ -143,6 +143,8 @@ function modal_templates_set_trigger_attributes(
 	$processor->set_attribute( 'data-modal-content-id', $content_id );
 	$processor->set_attribute( 'data-modal-width', $modal_width );
 	$processor->set_attribute( 'aria-haspopup', 'dialog' );
+	$processor->set_attribute( 'aria-expanded', 'false' );
+	$processor->set_attribute( 'aria-controls', 'mt-modal-shell' );
 	$processor->set_attribute( 'role', 'button' );
 	$processor->set_attribute( 'tabindex', '0' );
 }

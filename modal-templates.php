@@ -1,10 +1,11 @@
 <?php
 /**
  * Plugin Name: Modal Templates
- * Plugin URI:  https://github.com/
+ * Plugin URI:  https://github.com/philhoyt/Modal-Templates
  * Description: Block-based modals driven by template parts. Design modal contents in the Site Editor and attach them to button or card triggers—works inside Query Loops.
  * Version:     1.0.0
- * Author:      Phil Hoyt
+ * Author:      philhoyt
+ * Author URI:  https://philhoyt.com
  * License:     GPL-2.0-or-later
  * Text Domain: modal-templates
  * Requires at least: 6.4

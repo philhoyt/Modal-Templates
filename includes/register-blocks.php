@@ -91,8 +91,9 @@ function modal_templates_filter_core_button( string $block_content, array $block
 		return $block_content;
 	}
 
-	$modal_width = in_array( $block['attrs']['modalWidth'] ?? 'medium', array( 'small', 'medium', 'large', 'full' ), true )
-		? $block['attrs']['modalWidth']
+	$modal_width_raw = $block['attrs']['modalWidth'] ?? 'medium';
+	$modal_width     = in_array( $modal_width_raw, array( 'small', 'medium', 'large', 'full' ), true )
+		? $modal_width_raw
 		: 'medium';
 
 	$content_id = 'mt-tpl-' . wp_unique_id();

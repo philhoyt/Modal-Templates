@@ -1,6 +1,8 @@
 <?php
 /**
  * Register Modal Templates blocks, enqueue assets, and extend core/button.
+ *
+ * @package modal-templates
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -26,14 +28,14 @@ function modal_templates_enqueue_frontend_assets(): void {
 	wp_enqueue_style(
 		'modal-templates-frontend',
 		MODAL_TEMPLATES_URL . 'assets/css/modal-frontend.css',
-		[],
+		array(),
 		MODAL_TEMPLATES_VERSION
 	);
 
 	wp_enqueue_script(
 		'modal-templates-frontend',
 		MODAL_TEMPLATES_URL . 'assets/js/modal-frontend.js',
-		[],
+		array(),
 		MODAL_TEMPLATES_VERSION,
 		true
 	);
@@ -60,9 +62,9 @@ function modal_templates_enqueue_editor_assets(): void {
 	wp_localize_script(
 		'modal-templates-editor',
 		'modalTemplatesData',
-		[
+		array(
 			'adminUrl' => esc_url_raw( admin_url() ),
-		]
+		)
 	);
 }
 
@@ -80,7 +82,7 @@ function modal_templates_enqueue_editor_assets(): void {
  * @return string
  */
 function modal_templates_filter_core_button( string $block_content, array $block ): string {
-	if ( $block['blockName'] !== 'core/button' ) {
+	if ( 'core/button' !== $block['blockName'] ) {
 		return $block_content;
 	}
 
@@ -89,7 +91,7 @@ function modal_templates_filter_core_button( string $block_content, array $block
 		return $block_content;
 	}
 
-	$modal_width = in_array( $block['attrs']['modalWidth'] ?? 'medium', [ 'small', 'medium', 'large', 'full' ], true )
+	$modal_width = in_array( $block['attrs']['modalWidth'] ?? 'medium', array( 'small', 'medium', 'large', 'full' ), true )
 		? $block['attrs']['modalWidth']
 		: 'medium';
 

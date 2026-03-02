@@ -15,7 +15,7 @@
 import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody, SelectControl } from '@wordpress/components';
 import { registerBlockVariation } from '@wordpress/blocks';
 import TemplateSelector from '../shared/TemplateSelector';
@@ -28,7 +28,9 @@ addFilter(
 	'blocks.registerBlockType',
 	'modal-templates/button-attributes',
 	( settings, name ) => {
-		if ( name !== 'core/button' ) return settings;
+		if ( name !== 'core/button' ) {
+			return settings;
+		}
 
 		return {
 			...settings,
@@ -86,10 +88,7 @@ const withModalInspector = createHigherOrderComponent( ( BlockEdit ) => {
 
 						{ modalSlug && (
 							<SelectControl
-								label={ __(
-									'Modal width',
-									'modal-templates'
-								) }
+								label={ __( 'Modal width', 'modal-templates' ) }
 								value={ modalWidth }
 								options={ widthOptions }
 								onChange={ ( value ) =>

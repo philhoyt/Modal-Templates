@@ -30,7 +30,7 @@
 	/* State                                                                */
 	/* ------------------------------------------------------------------ */
 
-	let shell       = null; // Single shared modal shell appended to <body>.
+	let shell = null; // Single shared modal shell appended to <body>.
 	let lastTrigger = null; // Element that opened the modal (for focus return).
 
 	/* ------------------------------------------------------------------ */
@@ -38,7 +38,9 @@
 	/* ------------------------------------------------------------------ */
 
 	function getShell() {
-		if ( shell ) return shell;
+		if ( shell ) {
+			return shell;
+		}
 
 		shell = document.createElement( 'div' );
 		shell.id = 'mt-modal-shell';
@@ -64,8 +66,12 @@
 		`;
 
 		document.body.appendChild( shell );
-		shell.querySelector( '[data-mt-close]' ).addEventListener( 'click', closeModal );
-		shell.querySelector( '[data-mt-backdrop]' ).addEventListener( 'click', closeModal );
+		shell
+			.querySelector( '[data-mt-close]' )
+			.addEventListener( 'click', closeModal );
+		shell
+			.querySelector( '[data-mt-backdrop]' )
+			.addEventListener( 'click', closeModal );
 
 		return shell;
 	}
@@ -76,13 +82,17 @@
 
 	function openModal( triggerEl ) {
 		const contentId = triggerEl.dataset.modalContentId;
-		const width     = triggerEl.dataset.modalWidth || 'medium';
+		const width = triggerEl.dataset.modalWidth || 'medium';
 
-		if ( ! contentId ) return;
+		if ( ! contentId ) {
+			return;
+		}
 
 		// Find the pre-rendered <template> element.
 		const tpl = document.getElementById( contentId );
-		if ( ! tpl ) return;
+		if ( ! tpl ) {
+			return;
+		}
 
 		lastTrigger = triggerEl;
 		const s = getShell();
@@ -101,14 +111,16 @@
 		document.body.classList.add( 'mt-modal-open' );
 
 		// Move focus to first focusable element inside the dialog.
-		requestAnimationFrame( () => {
+		window.requestAnimationFrame( () => {
 			const first = s.querySelector( FOCUSABLE );
 			( first || s ).focus();
 		} );
 	}
 
 	function closeModal() {
-		if ( ! shell ) return;
+		if ( ! shell ) {
+			return;
+		}
 
 		shell.setAttribute( 'aria-hidden', 'true' );
 		shell.classList.remove( 'mt-modal--open' );
@@ -125,7 +137,9 @@
 	/* ------------------------------------------------------------------ */
 
 	document.addEventListener( 'keydown', function ( e ) {
-		if ( ! shell || ! shell.classList.contains( 'mt-modal--open' ) ) return;
+		if ( ! shell || ! shell.classList.contains( 'mt-modal--open' ) ) {
+			return;
+		}
 
 		if ( e.key === 'Escape' ) {
 			closeModal();
@@ -134,17 +148,25 @@
 
 		// Focus trap.
 		if ( e.key === 'Tab' ) {
-			const dialog   = shell.querySelector( '[data-mt-dialog]' );
-			const focusable = Array.from( dialog.querySelectorAll( FOCUSABLE ) );
-			if ( focusable.length === 0 ) { e.preventDefault(); return; }
+			const dialog = shell.querySelector( '[data-mt-dialog]' );
+			const focusable = Array.from(
+				dialog.querySelectorAll( FOCUSABLE )
+			);
+			if ( focusable.length === 0 ) {
+				e.preventDefault();
+				return;
+			}
 
 			const first = focusable[ 0 ];
-			const last  = focusable[ focusable.length - 1 ];
+			const last = focusable[ focusable.length - 1 ];
 
-			if ( e.shiftKey && document.activeElement === first ) {
+			if ( e.shiftKey && shell.ownerDocument.activeElement === first ) {
 				e.preventDefault();
 				last.focus();
-			} else if ( ! e.shiftKey && document.activeElement === last ) {
+			} else if (
+				! e.shiftKey &&
+				shell.ownerDocument.activeElement === last
+			) {
 				e.preventDefault();
 				first.focus();
 			}
@@ -156,18 +178,22 @@
 	/* ------------------------------------------------------------------ */
 
 	function wireTriggers() {
-		document.querySelectorAll( '[data-modal-content-id]' ).forEach( ( el ) => {
-			if ( el.dataset.mtBound ) return;
-			el.dataset.mtBound = '1';
-
-			el.addEventListener( 'click', () => openModal( el ) );
-			el.addEventListener( 'keydown', ( e ) => {
-				if ( e.key === 'Enter' || e.key === ' ' ) {
-					e.preventDefault();
-					openModal( el );
+		document
+			.querySelectorAll( '[data-modal-content-id]' )
+			.forEach( ( el ) => {
+				if ( el.dataset.mtBound ) {
+					return;
 				}
+				el.dataset.mtBound = '1';
+
+				el.addEventListener( 'click', () => openModal( el ) );
+				el.addEventListener( 'keydown', ( e ) => {
+					if ( e.key === 'Enter' || e.key === ' ' ) {
+						e.preventDefault();
+						openModal( el );
+					}
+				} );
 			} );
-		} );
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -182,5 +208,4 @@
 
 	// Public API for advanced integrations.
 	window.ModalTemplates = { open: openModal, close: closeModal };
-
 } )();

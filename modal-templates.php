@@ -9,6 +9,8 @@
  * Text Domain: modal-templates
  * Requires at least: 6.4
  * Requires PHP: 8.1
+ *
+ * @package modal-templates
  */
 
 defined( 'ABSPATH' ) || exit;

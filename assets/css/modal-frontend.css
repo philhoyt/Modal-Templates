@@ -40,7 +40,9 @@
 }
 
 @keyframes mt-backdrop-in {
+
 	from { opacity: 0; }
+
 	to   { opacity: 1; }
 }
 
@@ -78,10 +80,12 @@
 }
 
 @keyframes mt-dialog-in {
+
 	from {
 		opacity: 0;
 		transform: translateY(12px) scale(0.97);
 	}
+
 	to {
 		opacity: 1;
 		transform: translateY(0) scale(1);
@@ -90,8 +94,11 @@
 
 /* Width variants */
 .mt-modal__dialog[data-mt-width="small"]  { max-width: 480px; }
+
 .mt-modal__dialog[data-mt-width="medium"] { max-width: 640px; }
+
 .mt-modal__dialog[data-mt-width="large"]  { max-width: 960px; }
+
 .mt-modal__dialog[data-mt-width="full"]   { max-width: calc(100vw - 3rem); }
 
 /* --------------------------------------------------------------------------
@@ -121,7 +128,7 @@
 .mt-modal__close:focus-visible {
 	background: #f0f0f0;
 	color: #111;
-	outline: 2px solid currentColor;
+	outline: 2px solid currentcolor;
 	outline-offset: 2px;
 }
 
@@ -161,6 +168,7 @@
 }
 
 @keyframes mt-spin {
+
 	to { transform: rotate(360deg); }
 }
 
@@ -207,6 +215,7 @@
    -------------------------------------------------------------------------- */
 
 @media (max-width: 480px) {
+
 	.mt-modal__positioner {
 		align-items: flex-end;
 		padding: 0;
@@ -219,10 +228,12 @@
 	}
 
 	@keyframes mt-dialog-in-mobile {
+
 		from {
 			opacity: 0;
 			transform: translateY(100%);
 		}
+
 		to {
 			opacity: 1;
 			transform: translateY(0);
@@ -235,6 +246,7 @@
    -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+
 	.mt-modal__backdrop,
 	.mt-modal__dialog {
 		animation: none;

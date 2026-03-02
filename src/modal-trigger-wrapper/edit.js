@@ -8,9 +8,20 @@ import { PanelBody, SelectControl } from '@wordpress/components';
 import TemplateSelector from '../shared/TemplateSelector';
 
 const TEMPLATE = [
-	[ 'core/image',   { sizeSlug: 'large' } ],
-	[ 'core/heading', { level: 3, placeholder: __( 'Card Heading…', 'modal-templates' ) } ],
-	[ 'core/paragraph', { placeholder: __( 'Card description. The whole card opens a modal on click.', 'modal-templates' ) } ],
+	[ 'core/image', { sizeSlug: 'large' } ],
+	[
+		'core/heading',
+		{ level: 3, placeholder: __( 'Card Heading…', 'modal-templates' ) },
+	],
+	[
+		'core/paragraph',
+		{
+			placeholder: __(
+				'Card description. The whole card opens a modal on click.',
+				'modal-templates'
+			),
+		},
+	],
 ];
 
 const widthOptions = [
@@ -26,7 +37,9 @@ export default function Edit( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps( {
 		className: [
 			'modal-trigger-wrapper',
-			modalSlug ? 'modal-trigger-wrapper--active' : 'modal-trigger-wrapper--unassigned',
+			modalSlug
+				? 'modal-trigger-wrapper--active'
+				: 'modal-trigger-wrapper--unassigned',
 		].join( ' ' ),
 		style: {
 			cursor: modalSlug ? 'pointer' : 'default',
@@ -94,8 +107,17 @@ export default function Edit( { attributes, setAttributes } ) {
 			</div>
 
 			{ ! modalSlug && (
-				<p style={ { color: '#757575', fontSize: '12px', marginTop: '4px' } }>
-					{ __( '⚠ No modal template part selected. Use the sidebar to assign one.', 'modal-templates' ) }
+				<p
+					style={ {
+						color: '#757575',
+						fontSize: '12px',
+						marginTop: '4px',
+					} }
+				>
+					{ __(
+						'⚠ No modal template part selected. Use the sidebar to assign one.',
+						'modal-templates'
+					) }
 				</p>
 			) }
 		</>

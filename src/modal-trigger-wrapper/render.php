@@ -15,12 +15,14 @@
  * When used inside a Query Loop the render runs once per post, so each
  * card gets its own pre-rendered modal content from the same shared
  * template part, filled with that post's data.
+ *
+ * @package modal-templates
  */
 
 defined( 'ABSPATH' ) || exit;
 
 $modal_slug  = sanitize_title( $attributes['modalSlug'] ?? '' );
-$modal_width = in_array( $attributes['width'] ?? 'medium', [ 'small', 'medium', 'large', 'full' ], true )
+$modal_width = in_array( $attributes['width'] ?? 'medium', array( 'small', 'medium', 'large', 'full' ), true )
 	? $attributes['width']
 	: 'medium';
 
@@ -35,14 +37,14 @@ if ( ! $modal_slug ) {
 $content_id = 'mt-tpl-' . wp_unique_id();
 
 $wrapper_attributes = get_block_wrapper_attributes(
-	[
+	array(
 		'class'                 => 'wp-block-modal-templates-modal-trigger-wrapper modal-trigger-wrapper--active',
 		'data-modal-content-id' => $content_id,
 		'data-modal-width'      => $modal_width,
 		'role'                  => 'button',
 		'tabindex'              => '0',
 		'aria-haspopup'         => 'dialog',
-	]
+	)
 );
 ?>
 

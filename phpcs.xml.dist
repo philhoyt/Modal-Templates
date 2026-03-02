@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<ruleset name="Modal Templates">
+	<description>WordPress Coding Standards for the Modal Templates plugin.</description>
+
+	<file>modal-templates.php</file>
+	<file>includes</file>
+	<file>src</file>
+
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="extensions" value="php"/>
+
+	<!-- Exclude build and vendor output. -->
+	<exclude-pattern>build/*</exclude-pattern>
+	<exclude-pattern>node_modules/*</exclude-pattern>
+	<exclude-pattern>vendor/*</exclude-pattern>
+
+	<!-- render.php files are block template files included by WordPress with
+	     framework-injected variables ($attributes, $content, $block). The local
+	     variables derived from these are scoped to the template context and do not
+	     need plugin prefixes — this matches WordPress's own block render.php pattern. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<exclude-pattern>src/*/render\.php</exclude-pattern>
+	</rule>
+
+	<rule ref="WordPress">
+		<!-- render.php files use $content which is pre-escaped block output. -->
+		<exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="modal-templates"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="modal_templates"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

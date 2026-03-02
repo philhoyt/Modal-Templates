@@ -19,9 +19,8 @@ import {
 	BaseControl,
 	ExternalLink,
 } from '@wordpress/components';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 const MODAL_AREA = 'modal';
@@ -65,12 +64,14 @@ export default function TemplateSelector( { value, onChange } ) {
 	// Create a new modal template part and open it in the Site Editor     //
 	// ------------------------------------------------------------------ //
 	const handleCreate = async () => {
-		if ( isCreating ) return;
+		if ( isCreating ) {
+			return;
+		}
 		setIsCreating( true );
 
 		try {
 			const timestamp = Date.now();
-			const slug  = `modal-${ timestamp }`;
+			const slug = `modal-${ timestamp }`;
 			const title = sprintf(
 				/* translators: %s: auto-generated number */
 				__( 'Modal %s', 'modal-templates' ),
@@ -111,7 +112,10 @@ export default function TemplateSelector( { value, onChange } ) {
 			}
 		} catch ( err ) {
 			// eslint-disable-next-line no-console
-			console.error( 'Modal Templates: failed to create template part', err );
+			console.error(
+				'Modal Templates: failed to create template part',
+				err
+			);
 		} finally {
 			setIsCreating( false );
 		}
@@ -163,7 +167,14 @@ export default function TemplateSelector( { value, onChange } ) {
 				</p>
 			) }
 
-			<div style={ { display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' } }>
+			<div
+				style={ {
+					display: 'flex',
+					gap: '8px',
+					marginTop: '8px',
+					flexWrap: 'wrap',
+				} }
+			>
 				<Button
 					variant="secondary"
 					size="small"

@@ -1,0 +1,11 @@
+{
+	"extends": [ "@wordpress/stylelint-config" ],
+	"rules": {
+		"selector-class-pattern": [
+			"^[a-z][a-z0-9-]*(__[a-z][a-z0-9-]*)?(--[a-z][a-z0-9-]*)?$",
+			{
+				"message": "Class selectors should use BEM notation: block__element--modifier (lowercase, hyphens only)"
+			}
+		]
+	}
+}

@@ -215,16 +215,21 @@
 		shell.classList.add( 'mt-modal--closing' );
 
 		const dialog = shell.querySelector( '[data-mt-dialog]' );
+		const contentEl = shell.querySelector( '[data-mt-content]' );
+
+		function afterClose() {
+			shell.classList.remove( 'mt-modal--closing' );
+			// Clear content so iframes (Mux, YouTube, Vimeo, etc.) stop playing.
+			contentEl.innerHTML = '';
+		}
 
 		// Timeout fallback covers reduced-motion (animationend never fires).
-		const timer = setTimeout( function () {
-			shell.classList.remove( 'mt-modal--closing' );
-		}, 300 );
+		const timer = setTimeout( afterClose, 300 );
 
 		dialog.addEventListener( 'animationend', function handler() {
 			clearTimeout( timer );
-			shell.classList.remove( 'mt-modal--closing' );
 			dialog.removeEventListener( 'animationend', handler );
+			afterClose();
 		} );
 	}
 

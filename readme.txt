@@ -108,6 +108,11 @@ Override the z-index custom property in your theme CSS:
 }
 `
 
+== Screenshots ==
+
+1. The Modal inspector panel — select a template part and set a width directly from the block sidebar.
+2. An example modal open on the frontend, showing a team member bio triggered from a Query Loop.
+
 == Changelog ==
 
 = 1.0.0 =

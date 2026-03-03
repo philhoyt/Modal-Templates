@@ -2,6 +2,11 @@
 
 A WordPress block plugin that lets you design modal contents as template parts in the Site Editor, then attach them to any button or group block as a trigger. 
 
+## Screenshots
+
+![Modal inspector panel — select a template part and set a width directly from the block sidebar](assets/screenshot-1.png)
+![Example modal open on the frontend showing a team member bio triggered from a Query Loop](assets/screenshot-2.png)
+
 ## How it works
 
 1. You design modal content as a **template part** in the Site Editor

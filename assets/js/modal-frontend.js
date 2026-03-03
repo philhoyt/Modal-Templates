@@ -89,8 +89,9 @@
 
 	function lockScroll() {
 		scrollY = window.pageYOffset;
+		const adminBarHeight = parseInt( getComputedStyle( document.documentElement ).marginTop, 10 ) || 0;
 		document.body.style.position = 'fixed';
-		document.body.style.top = `-${ scrollY }px`;
+		document.body.style.top = `${ adminBarHeight - scrollY }px`;
 		document.body.style.width = '100%';
 	}
 

@@ -108,6 +108,14 @@ npm run lint:php
 npm run format     # Auto-format JS/CSS
 ```
 
+## Changelog
+
+### 1.0.1
+- Fix: Modal now centres on screen on mobile instead of appearing at the bottom.
+
+### 1.0.0
+- Initial release.
+
 ## License
 
 GPL-2.0-or-later — see [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)

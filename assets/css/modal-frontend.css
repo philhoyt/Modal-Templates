@@ -200,44 +200,11 @@
 @media (max-width: 480px) {
 
 	.mt-modal__positioner {
-		align-items: flex-end;
-		padding: 0;
+		padding: 1rem;
 	}
 
 	.mt-modal__dialog {
-		border-radius: var(--mt-dialog-radius) var(--mt-dialog-radius) 0 0;
-		max-height: 90dvh;
-		animation-name: mt-dialog-in-mobile;
-	}
-
-	@keyframes mt-dialog-in-mobile {
-
-		from {
-			opacity: 0;
-			transform: translateY(100%);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	#mt-modal-shell.mt-modal--closing .mt-modal__dialog {
-		animation: mt-dialog-out-mobile 200ms ease forwards;
-	}
-
-	@keyframes mt-dialog-out-mobile {
-
-		from {
-			opacity: 1;
-			transform: translateY(0);
-		}
-
-		to {
-			opacity: 0;
-			transform: translateY(100%);
-		}
+		max-height: calc(100dvh - 2rem);
 	}
 }
 

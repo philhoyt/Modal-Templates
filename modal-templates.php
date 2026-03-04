@@ -3,7 +3,7 @@
  * Plugin Name: Modal Templates
  * Plugin URI:  https://github.com/philhoyt/Modal-Templates
  * Description: Block-based modals driven by template parts. Design modal contents in the Site Editor and attach them to button or card triggers—works inside Query Loops.
- * Version:     1.0.1
+ * Version:     1.0.2
  * Author:      philhoyt
  * Author URI:  https://philhoyt.com
  * License:     GPL-2.0-or-later
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'MODAL_TEMPLATES_VERSION', '1.0.1' );
+define( 'MODAL_TEMPLATES_VERSION', '1.0.2' );
 define( 'MODAL_TEMPLATES_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MODAL_TEMPLATES_URL', plugin_dir_url( __FILE__ ) );
 

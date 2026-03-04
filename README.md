@@ -110,6 +110,9 @@ npm run format     # Auto-format JS/CSS
 
 ## Changelog
 
+### 1.0.2
+- Fix: Prevent layout shift caused by scrollbar disappearing when a modal opens on Windows.
+
 ### 1.0.1
 - Fix: Modal now centres on screen on mobile instead of appearing at the bottom.
 

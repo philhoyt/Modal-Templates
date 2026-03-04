@@ -3,7 +3,7 @@ Contributors: philhoyt
 Tags: modal, popup, block editor, gutenberg, template parts
 Requires at least: 6.4
 Tested up to: 6.9
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -115,6 +115,9 @@ Override the z-index custom property in your theme CSS:
 
 == Changelog ==
 
+= 1.0.2 =
+* Fix: Prevent layout shift caused by scrollbar disappearing when a modal opens on Windows.
+
 = 1.0.1 =
 * Fix: Modal now centres on screen on mobile instead of appearing at the bottom.
 
@@ -122,6 +125,9 @@ Override the z-index custom property in your theme CSS:
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+Fixes a layout shift on Windows when a modal opens (caused by the scrollbar disappearing).
 
 = 1.0.1 =
 Fixes modal positioning on mobile — modals now appear centred instead of at the bottom of the screen.

@@ -38,6 +38,13 @@
 	let shell = null; // Single shared modal shell appended to <body>.
 	let lastTrigger = null; // Element that opened the modal (for focus return).
 	let scrollY = 0; // Saved scroll position for iOS scroll lock.
+	let savedPaddingRight = ''; // Stored so we can restore any existing body padding.
+
+	// iOS Safari ignores overflow:hidden on <html>/<body> and requires the
+	// position:fixed trick instead.  All other browsers use overflow:hidden.
+	const isIOS =
+		/iP(hone|ad|od)/.test( navigator.userAgent ) ||
+		( navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 );
 
 	/* ------------------------------------------------------------------ */
 	/* Shell bootstrap                                                      */
@@ -89,16 +96,41 @@
 
 	function lockScroll() {
 		scrollY = window.pageYOffset;
-		const adminBarHeight = parseInt( getComputedStyle( document.documentElement ).marginTop, 10 ) || 0;
-		document.body.style.position = 'fixed';
-		document.body.style.top = `${ adminBarHeight - scrollY }px`;
-		document.body.style.width = '100%';
+
+		// Compensate for scrollbar width to prevent layout shift (Windows, etc).
+		// Measure before locking so the scrollbar is still present.
+		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+		if ( scrollbarWidth > 0 ) {
+			savedPaddingRight = document.body.style.paddingRight;
+			document.body.style.paddingRight =
+				`${ parseInt( getComputedStyle( document.body ).paddingRight, 10 ) + scrollbarWidth }px`;
+		}
+
+		if ( isIOS ) {
+			// iOS Safari requires position:fixed to prevent body scrolling.
+			const adminBarHeight = parseInt( getComputedStyle( document.documentElement ).marginTop, 10 ) || 0;
+			document.body.style.position = 'fixed';
+			document.body.style.top = `${ adminBarHeight - scrollY }px`;
+			document.body.style.width = '100%';
+		} else {
+			// All other browsers: hide overflow on the root element.
+			// This keeps the body width stable so padding-right works correctly.
+			document.documentElement.style.overflow = 'hidden';
+		}
 	}
 
 	function unlockScroll() {
-		document.body.style.removeProperty( 'position' );
-		document.body.style.removeProperty( 'top' );
-		document.body.style.removeProperty( 'width' );
+		document.body.style.paddingRight = savedPaddingRight;
+		savedPaddingRight = '';
+
+		if ( isIOS ) {
+			document.body.style.removeProperty( 'position' );
+			document.body.style.removeProperty( 'top' );
+			document.body.style.removeProperty( 'width' );
+		} else {
+			document.documentElement.style.removeProperty( 'overflow' );
+		}
+
 		window.scrollTo( 0, scrollY );
 	}
 

@@ -34,9 +34,11 @@ Because rendering happens inside the `render_block` filter, it runs within the a
 
 ## Installation
 
-1. Upload the `modal-templates` folder to `/wp-content/plugins/`
-2. Activate via **Plugins > Installed Plugins**
-3. Optionally adjust styles at **Settings > Modal Templates**
+1. Go to the [latest release on GitHub](https://github.com/philhoyt/Modal-Templates/releases/latest) and download the `modal-templates.zip` asset
+2. In your WordPress admin, go to **Plugins > Add New Plugin > Upload Plugin**
+3. Choose the downloaded `.zip` file and click **Install Now**
+4. Click **Activate Plugin**
+5. Optionally adjust styles at **Settings > Modal Templates**
 
 ## Usage
 

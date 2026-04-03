@@ -11,8 +11,10 @@
 	<arg value="sp"/>
 	<arg name="extensions" value="php"/>
 
-	<!-- Exclude build and vendor output. -->
+	<!-- Exclude build and dependency output. -->
+	<exclude-pattern>bin/*</exclude-pattern>
 	<exclude-pattern>build/*</exclude-pattern>
+	<exclude-pattern>lib/*</exclude-pattern>
 	<exclude-pattern>node_modules/*</exclude-pattern>
 	<exclude-pattern>vendor/*</exclude-pattern>
 

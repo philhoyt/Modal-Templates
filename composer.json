@@ -1,11 +1,17 @@
 {
+    "require": {
+        "yahnis-elsts/plugin-update-checker": "^5.5"
+    },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.13",
         "wp-coding-standards/wpcs": "^3.3",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.2"
     },
     "scripts": {
-        "lint": "phpcs"
+        "lint": "phpcs",
+        "copy-puc": "@php bin/copy-puc.php",
+        "post-install-cmd": [ "@copy-puc" ],
+        "post-update-cmd": [ "@copy-puc" ]
     },
     "config": {
         "allow-plugins": {

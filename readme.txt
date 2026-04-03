@@ -3,7 +3,7 @@ Contributors: philhoyt
 Tags: modal, popup, block editor, gutenberg, template parts
 Requires at least: 6.4
 Tested up to: 6.9
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 Requires PHP: 8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -117,6 +117,10 @@ Override the z-index custom property in your theme CSS:
 
 == Changelog ==
 
+= 1.1.0 =
+* New: Group block modal triggers now convert nested links to spans, preventing invalid HTML and ensuring the whole group is reliably clickable.
+* New: Automatic update notifications via GitHub releases — WordPress will now prompt you to update when a new release is published.
+
 = 1.0.2 =
 * Fix: Prevent layout shift caused by scrollbar disappearing when a modal opens on Windows.
 
@@ -127,6 +131,9 @@ Override the z-index custom property in your theme CSS:
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Group block triggers now handle nested links correctly. Adds automatic update notifications from GitHub releases.
 
 = 1.0.2 =
 Fixes a layout shift on Windows when a modal opens (caused by the scrollbar disappearing).

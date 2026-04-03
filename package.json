@@ -1,6 +1,6 @@
 {
   "name": "modal-templates",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Block-based modal plugin for WordPress",
   "files": [
     "assets/",

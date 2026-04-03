@@ -112,6 +112,10 @@ npm run format     # Auto-format JS/CSS
 
 ## Changelog
 
+### 1.1.0
+- New: Group block modal triggers now convert nested links to spans, preventing invalid HTML and ensuring the whole group is reliably clickable.
+- New: Automatic update notifications via GitHub releases — WordPress will now prompt you to update when a new release is published.
+
 ### 1.0.2
 - Fix: Prevent layout shift caused by scrollbar disappearing when a modal opens on Windows.
 

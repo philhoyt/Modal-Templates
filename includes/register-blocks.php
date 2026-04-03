@@ -117,6 +117,10 @@ function modal_templates_filter_modal_block( string $block_content, array $block
 
 	$modified = $processor->get_updated_html();
 
+	if ( 'core/group' === $block['blockName'] ) {
+		$modified = modal_templates_strip_nested_anchors( $modified );
+	}
+
 	// ------------------------------------------------------------------ //
 	// Pre-render modal content into a <template> element                  //
 	// ------------------------------------------------------------------ //
@@ -132,6 +136,22 @@ function modal_templates_filter_modal_block( string $block_content, array $block
 	);
 
 	return $modified;
+}
+
+/**
+ * Replace all <a> elements inside a group trigger with <span> elements.
+ *
+ * When a core/group block acts as a modal trigger it receives role="button",
+ * making any nested <a> tags invalid HTML. Swapping them to <span> preserves
+ * visual styling (classes/styles carry over) while producing valid markup.
+ *
+ * @param string $html Rendered group block HTML.
+ * @return string
+ */
+function modal_templates_strip_nested_anchors( string $html ): string {
+	$html = preg_replace( '/<a\b([^>]*)>/i', '<span$1>', $html );
+	$html = preg_replace( '/<\/a>/i', '</span>', $html );
+	return $html;
 }
 
 /**

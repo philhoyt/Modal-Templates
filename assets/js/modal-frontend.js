@@ -99,16 +99,23 @@
 
 		// Compensate for scrollbar width to prevent layout shift (Windows, etc).
 		// Measure before locking so the scrollbar is still present.
-		const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+		const scrollbarWidth =
+			window.innerWidth - document.documentElement.clientWidth;
 		if ( scrollbarWidth > 0 ) {
 			savedPaddingRight = document.body.style.paddingRight;
-			document.body.style.paddingRight =
-				`${ parseInt( getComputedStyle( document.body ).paddingRight, 10 ) + scrollbarWidth }px`;
+			document.body.style.paddingRight = `${
+				parseInt( getComputedStyle( document.body ).paddingRight, 10 ) +
+				scrollbarWidth
+			}px`;
 		}
 
 		if ( isIOS ) {
 			// iOS Safari requires position:fixed to prevent body scrolling.
-			const adminBarHeight = parseInt( getComputedStyle( document.documentElement ).marginTop, 10 ) || 0;
+			const adminBarHeight =
+				parseInt(
+					getComputedStyle( document.documentElement ).marginTop,
+					10
+				) || 0;
 			document.body.style.position = 'fixed';
 			document.body.style.top = `${ adminBarHeight - scrollY }px`;
 			document.body.style.width = '100%';

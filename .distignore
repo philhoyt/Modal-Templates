@@ -1,0 +1,30 @@
+# Claude Code — project assistant config, not part of the plugin
+.claude
+
+# Dev tooling and sources excluded from the distributable zip
+.distignore
+eslint.config.js
+.stylelintrc.json
+.gitignore
+.git
+.DS_Store
+artifacts
+bin
+docs
+node_modules
+specs
+src
+tests
+test-results
+vendor
+.wp-env.json
+composer.json
+composer.lock
+package.json
+package-lock.json
+phpcs.xml.dist
+phpstan.neon
+phpunit.xml
+playwright.config.js
+webpack.config.js
+*.zip

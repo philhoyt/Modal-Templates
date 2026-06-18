@@ -9,7 +9,9 @@ parameters:
         - includes
         - modal-templates.php
     excludePaths:
-        - vendor
-        - node_modules
-        - build
-        - tests
+        # Marked optional with (?) so analysis doesn't error in environments
+        # where these aren't present (e.g. the CI php job skips npm install/build).
+        - vendor (?)
+        - node_modules (?)
+        - build (?)
+        - tests (?)

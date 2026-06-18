@@ -22,8 +22,10 @@ composer.json
 composer.lock
 package.json
 package-lock.json
+.github
 phpcs.xml.dist
 phpstan.neon
+phpstan-bootstrap.php
 phpunit.xml
 playwright.config.js
 webpack.config.js

@@ -2,7 +2,7 @@
 
 Block-based modal plugin for WordPress. Modals are designed as template parts in the Site Editor and attached to core/button or core/group triggers. Works inside Query Loops via inline pre-rendering.
 
-- **Plugin**: `modal-templates` | v1.0.0 | Requires WP 6.4+, PHP 8.1+
+- **Plugin**: `modal-templates` | v1.1.0 | Requires WP 6.4+, PHP 8.1+
 - **Text domain**: `modal-templates`
 - **GitHub**: https://github.com/philhoyt/Modal-Templates
 
@@ -23,7 +23,6 @@ Block-based modal plugin for WordPress. Modals are designed as template parts in
 | `includes/register-blocks.php` | Enqueues assets; `render_block` filter injects data attrs + `<template>` |
 | `includes/template-parts.php` | Registers "Modal" template part area |
 | `includes/settings.php` | Admin settings page + CSS custom property output |
-| `includes/rest-api.php` | REST endpoint `/wp-json/modal-templates/v1/render` (dynamic re-render) |
 | `src/modal-button/index.js` | Editor extensions for core/button and core/group |
 | `src/shared/TemplateSelector.js` | ComboboxControl for choosing/creating modal template parts |
 | `assets/js/modal-frontend.js` | Open/close, focus trap, public API (`window.ModalTemplates`) |

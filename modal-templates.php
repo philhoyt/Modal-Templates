@@ -32,5 +32,8 @@ if ( file_exists( MODAL_TEMPLATES_DIR . 'lib/plugin-update-checker/plugin-update
 		__FILE__,
 		'modal-templates'
 	);
-	$modal_templates_update_checker->getVcsApi()->enableReleaseAssets();
+	$modal_templates_vcs_api        = $modal_templates_update_checker->getVcsApi();
+	if ( method_exists( $modal_templates_vcs_api, 'enableReleaseAssets' ) ) {
+		$modal_templates_vcs_api->enableReleaseAssets();
+	}
 }

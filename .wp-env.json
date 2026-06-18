@@ -1,0 +1,9 @@
+{
+	"core": null,
+	"phpVersion": "8.1",
+	"port": 8990,
+	"testsPort": 8991,
+	"mappings": {
+		"wp-content/plugins/modal-templates": "."
+	}
+}

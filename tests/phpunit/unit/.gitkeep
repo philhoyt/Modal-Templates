@@ -1,0 +1,2 @@
+# Keeps the unit test suite directory tracked in git (see phpunit.xml).
+# Brain Monkey-style unit tests (no WordPress bootstrap) go here.

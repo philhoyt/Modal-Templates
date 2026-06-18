@@ -100,7 +100,7 @@ function modal_templates_register_settings(): void {
  * Sanitize and validate style settings on save.
  *
  * @param mixed $input Raw POST data.
- * @return array<string,int|string> Sanitized values merged over defaults.
+ * @return array<string,float|int|string> Sanitized values merged over defaults.
  */
 function modal_templates_sanitize_styles( $input ): array {
 	$defaults = modal_templates_style_defaults();

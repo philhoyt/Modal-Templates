@@ -1,5 +1,7 @@
 # Modal Templates
 
+[![CI](https://github.com/philhoyt/Modal-Templates/actions/workflows/ci.yml/badge.svg)](https://github.com/philhoyt/Modal-Templates/actions/workflows/ci.yml)
+
 Design modal contents as template parts in the Site Editor and attach them to any button or group block as a trigger.
 
 ## Description

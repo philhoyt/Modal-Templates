@@ -3,7 +3,7 @@ Contributors: philhoyt
 Tags: modal, popup, block editor, gutenberg, template parts
 Requires at least: 6.4
 Tested up to: 7.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires PHP: 8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -114,6 +114,11 @@ Override any of these in your theme stylesheet. Site admins can adjust the most 
 * `--mt-z-index` — stacking order (default: 99999)
 
 == Changelog ==
+
+= 1.1.1 =
+* Change: Confirmed compatible with WordPress 7.0.
+* Change: Updated the bundled update checker to 5.7.
+* Maintenance: Removed unused internal code and added an automated test and CI suite. No changes to plugin behaviour.
 
 = 1.1.0 =
 * New: Group block modal triggers now convert nested links to spans, preventing invalid HTML and ensuring the whole group is reliably clickable.

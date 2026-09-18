@@ -21,6 +21,12 @@
 	/* Constants                                                            */
 	/* ------------------------------------------------------------------ */
 
+	// Translatable strings injected by PHP (wp_add_inline_script); English fallback.
+	const L10N = Object.assign(
+		{ dialogLabel: 'Modal', closeLabel: 'Close modal' },
+		window.modalTemplatesL10n || {}
+	);
+
 	const FOCUSABLE = [
 		'a[href]',
 		'button:not([disabled])',
@@ -39,6 +45,7 @@
 	let lastTrigger = null; // Element that opened the modal (for focus return).
 	let scrollY = 0; // Saved scroll position for iOS scroll lock.
 	let savedPaddingRight = ''; // Stored so we can restore any existing body padding.
+	let inertedEls = []; // Elements *we* made inert, so close only clears those.
 
 	// iOS Safari ignores overflow:hidden on <html>/<body> and requires the
 	// position:fixed trick instead.  All other browsers use overflow:hidden.
@@ -60,18 +67,13 @@
 		shell.setAttribute( 'role', 'dialog' );
 		shell.setAttribute( 'aria-modal', 'true' );
 		shell.setAttribute( 'aria-hidden', 'true' );
-		shell.setAttribute( 'aria-label', 'Modal' );
+		shell.setAttribute( 'aria-label', L10N.dialogLabel );
 		shell.setAttribute( 'tabindex', '-1' );
 		shell.innerHTML = `
 			<div class="mt-modal__backdrop" data-mt-backdrop></div>
 			<div class="mt-modal__positioner">
 				<div class="mt-modal__dialog" data-mt-dialog>
-					<button
-						class="mt-modal__close"
-						data-mt-close
-						aria-label="Close modal"
-						type="button"
-					>
+					<button class="mt-modal__close" data-mt-close type="button">
 						<span aria-hidden="true">&#x2715;</span>
 					</button>
 					<div class="mt-modal__content" data-mt-content></div>
@@ -80,9 +82,9 @@
 		`;
 
 		document.body.appendChild( shell );
-		shell
-			.querySelector( '[data-mt-close]' )
-			.addEventListener( 'click', closeModal );
+		const closeBtn = shell.querySelector( '[data-mt-close]' );
+		closeBtn.setAttribute( 'aria-label', L10N.closeLabel );
+		closeBtn.addEventListener( 'click', closeModal );
 		shell
 			.querySelector( '[data-mt-backdrop]' )
 			.addEventListener( 'click', closeModal );
@@ -151,19 +153,21 @@
 	 * from reaching background content while the modal is open — more
 	 * reliable than aria-modal alone (e.g. NVDA + Firefox).
 	 *
+	 * Elements that were already inert (set by the theme or another script)
+	 * are left alone in both directions.
+	 *
 	 * @param {boolean} active
 	 */
 	function setBackgroundInert( active ) {
-		Array.from( document.body.children ).forEach( ( el ) => {
-			if ( el === shell ) {
-				return;
-			}
-			if ( active ) {
-				el.setAttribute( 'inert', '' );
-			} else {
-				el.removeAttribute( 'inert' );
-			}
-		} );
+		if ( active ) {
+			inertedEls = Array.from( document.body.children ).filter(
+				( el ) => el !== shell && ! el.hasAttribute( 'inert' )
+			);
+			inertedEls.forEach( ( el ) => el.setAttribute( 'inert', '' ) );
+		} else {
+			inertedEls.forEach( ( el ) => el.removeAttribute( 'inert' ) );
+			inertedEls = [];
+		}
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -183,8 +187,13 @@
 			return;
 		}
 
-		lastTrigger = triggerEl;
 		const s = getShell();
+
+		// A trigger inside the open modal swaps the content; focus should
+		// still return to the element on the page that first opened it.
+		if ( ! s.classList.contains( 'mt-modal--open' ) ) {
+			lastTrigger = triggerEl;
+		}
 
 		// Cancel any in-progress close animation.
 		s.classList.remove( 'mt-modal--closing' );
@@ -208,7 +217,7 @@
 			s.removeAttribute( 'aria-label' );
 		} else {
 			s.removeAttribute( 'aria-labelledby' );
-			s.setAttribute( 'aria-label', 'Modal' );
+			s.setAttribute( 'aria-label', L10N.dialogLabel );
 		}
 
 		// Reflect open state on the trigger.
@@ -222,8 +231,13 @@
 		lockScroll();
 		setBackgroundInert( true );
 
-		// Move focus to first focusable element inside the dialog.
+		// Move focus to first focusable element inside the dialog. If the modal
+		// was closed again before this frame ran (fast Escape), leave focus
+		// where closeModal() put it — on the trigger.
 		window.requestAnimationFrame( () => {
+			if ( ! s.classList.contains( 'mt-modal--open' ) ) {
+				return;
+			}
 			const first = s.querySelector( FOCUSABLE );
 			( first || s ).focus();
 		} );
@@ -319,41 +333,75 @@
 	/* Trigger wiring                                                       */
 	/* ------------------------------------------------------------------ */
 
-	function wireTriggers() {
-		document
-			.querySelectorAll( '[data-modal-content-id]' )
-			.forEach( ( el ) => {
-				if ( el.dataset.mtBound ) {
-					return;
-				}
-				el.dataset.mtBound = '1';
+	const TRIGGER_SELECTOR = '[data-modal-content-id]';
 
-				// Ensure static aria attributes are present.
-				el.setAttribute( 'aria-controls', 'mt-modal-shell' );
-				if ( ! el.hasAttribute( 'aria-expanded' ) ) {
-					el.setAttribute( 'aria-expanded', 'false' );
-				}
-
-				el.addEventListener( 'click', () => openModal( el ) );
-				el.addEventListener( 'keydown', ( e ) => {
-					if ( e.key === 'Enter' || e.key === ' ' ) {
-						e.preventDefault();
-						openModal( el );
-					}
-				} );
-			} );
+	/**
+	 * Ensure the static ARIA attributes exist on every trigger currently in
+	 * the DOM. The PHP filter already emits them; this covers triggers added
+	 * by other code. Safe to call repeatedly.
+	 *
+	 * @param {Document|Element} [root=document] Subtree to scan.
+	 */
+	function wireTriggers( root = document ) {
+		root.querySelectorAll( TRIGGER_SELECTOR ).forEach( ( el ) => {
+			el.setAttribute( 'aria-controls', 'mt-modal-shell' );
+			if ( ! el.hasAttribute( 'aria-expanded' ) ) {
+				el.setAttribute( 'aria-expanded', 'false' );
+			}
+		} );
 	}
+
+	// Events are delegated so triggers injected after load (client-side
+	// pagination, AJAX, a trigger inside modal content) work without rebinding.
+	// Triggers may be <a href> (core/button with a URL set) — the modal
+	// replaces navigation, matching the keyboard path.
+	function resolveTrigger( e ) {
+		const target = e.target instanceof Element ? e.target : null;
+		return target ? target.closest( TRIGGER_SELECTOR ) : null;
+	}
+
+	document.addEventListener( 'click', ( e ) => {
+		const el = resolveTrigger( e );
+		if ( ! el ) {
+			return;
+		}
+		e.preventDefault();
+		openModal( el );
+	} );
+
+	document.addEventListener( 'keydown', ( e ) => {
+		if ( e.key !== 'Enter' && e.key !== ' ' ) {
+			return;
+		}
+		const el = resolveTrigger( e );
+		if ( ! el ) {
+			return;
+		}
+		e.preventDefault();
+		openModal( el );
+	} );
 
 	/* ------------------------------------------------------------------ */
 	/* Init                                                                 */
 	/* ------------------------------------------------------------------ */
 
-	if ( document.readyState === 'loading' ) {
-		document.addEventListener( 'DOMContentLoaded', wireTriggers );
-	} else {
+	function init() {
 		wireTriggers();
+		// Create the (hidden) shell up front so aria-controls="mt-modal-shell"
+		// on triggers always references an element that exists.
+		getShell();
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', init );
+	} else {
+		init();
 	}
 
 	// Public API for advanced integrations.
-	window.ModalTemplates = { open: openModal, close: closeModal };
+	window.ModalTemplates = {
+		open: openModal,
+		close: closeModal,
+		bind: wireTriggers,
+	};
 } )();

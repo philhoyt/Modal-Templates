@@ -38,7 +38,9 @@ test.beforeEach( async ( { page } ) => {
 	// about:blank gives us a clean document with no dependency on a running site;
 	// we inject the real shipped controller and the markup the PHP filter produces.
 	await page.goto( 'about:blank' );
-	await page.setContent( `<!DOCTYPE html><html><body>${ HARNESS }</body></html>` );
+	await page.setContent(
+		`<!DOCTYPE html><html><body>${ HARNESS }</body></html>`
+	);
 	// Load the real stylesheet so the backdrop/positioner layering (the dialog
 	// has pointer-events:all, the positioner none) behaves as it does in production.
 	await page.addStyleTag( { path: FRONTEND_STYLES } );
@@ -70,10 +72,15 @@ test( 'opening moves focus into the dialog and makes the background inert', asyn
 	await page.locator( '#trigger' ).click();
 
 	// Focus lands on the first focusable element inside the dialog (the close button).
-	await expect( page.locator( '#mt-modal-shell [data-mt-close]' ) ).toBeFocused();
+	await expect(
+		page.locator( '#mt-modal-shell [data-mt-close]' )
+	).toBeFocused();
 
 	// Background content outside the shell is marked inert.
-	await expect( page.locator( '#bg-content' ) ).toHaveAttribute( 'inert', '' );
+	await expect( page.locator( '#bg-content' ) ).toHaveAttribute(
+		'inert',
+		''
+	);
 } );
 
 test( 'the focus trap wraps Tab and Shift+Tab inside the dialog', async ( {
@@ -126,5 +133,86 @@ test( 'clicking the backdrop closes the modal', async ( { page } ) => {
 	await page.mouse.click( 10, 10 );
 	await expect( page.locator( '#mt-modal-shell' ) ).not.toHaveClass(
 		/mt-modal--open/
+	);
+} );
+
+test( 'the shell exists before the first open so aria-controls resolves', async ( {
+	page,
+} ) => {
+	const shell = page.locator( '#mt-modal-shell' );
+	await expect( shell ).toHaveCount( 1 );
+	await expect( shell ).toBeHidden();
+	await expect( page.locator( '#trigger' ) ).toHaveAttribute(
+		'aria-controls',
+		'mt-modal-shell'
+	);
+} );
+
+test( 'an <a href> trigger opens the modal instead of navigating', async ( {
+	page,
+} ) => {
+	// core/button with a Link URL set renders <a href="..."> as the trigger.
+	await page.evaluate( () => {
+		const a = document.createElement( 'a' );
+		a.id = 'link-trigger';
+		a.href = 'https://example.com/should-not-navigate';
+		a.dataset.modalContentId = 'mt-tpl-1';
+		a.textContent = 'Link trigger';
+		document.getElementById( 'bg-content' ).appendChild( a );
+	} );
+
+	await page.locator( '#link-trigger' ).click();
+	await expect( page.locator( '#mt-modal-shell' ) ).toHaveClass(
+		/mt-modal--open/
+	);
+	expect( page.url() ).toBe( 'about:blank' );
+} );
+
+test( 'triggers injected after load work without rebinding', async ( {
+	page,
+} ) => {
+	await page.evaluate( () => {
+		const btn = document.createElement( 'button' );
+		btn.id = 'late-trigger';
+		btn.type = 'button';
+		btn.dataset.modalContentId = 'mt-tpl-1';
+		btn.textContent = 'Late trigger';
+		document.getElementById( 'bg-content' ).appendChild( btn );
+	} );
+
+	await page.locator( '#late-trigger' ).click();
+	await expect( page.locator( '#mt-modal-shell' ) ).toHaveClass(
+		/mt-modal--open/
+	);
+	await expect( page.locator( '#late-trigger' ) ).toHaveAttribute(
+		'aria-expanded',
+		'true'
+	);
+} );
+
+test( 'closing leaves inert set by other code untouched', async ( {
+	page,
+} ) => {
+	await page.evaluate( () => {
+		const aside = document.createElement( 'aside' );
+		aside.id = 'already-inert';
+		aside.setAttribute( 'inert', '' );
+		document.body.appendChild( aside );
+	} );
+
+	await page.locator( '#trigger' ).click();
+	await expect( page.locator( '#bg-content' ) ).toHaveAttribute(
+		'inert',
+		''
+	);
+
+	await page.keyboard.press( 'Escape' );
+	await expect( page.locator( '#bg-content' ) ).not.toHaveAttribute(
+		'inert',
+		''
+	);
+	await expect( page.locator( '#already-inert' ) ).toHaveAttribute(
+		'inert',
+		''
 	);
 } );

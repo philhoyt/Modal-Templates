@@ -138,15 +138,21 @@ function modal_templates_sanitize_styles( $input ): array {
 /**
  * Convert a hex colour and integer opacity percentage to an rgba() string.
  *
- * @param string $hex     Six-digit hex colour (with leading #).
+ * @param string $hex     Three- or six-digit hex colour (with leading #).
  * @param int    $opacity 0–100 integer percentage.
  * @return string e.g. "rgba(0, 0, 0, 0.60)".
  */
 function modal_templates_hex_to_rgba( string $hex, int $opacity ): string {
 	$hex = ltrim( $hex, '#' );
-	$r   = hexdec( substr( $hex, 0, 2 ) );
-	$g   = hexdec( substr( $hex, 2, 2 ) );
-	$b   = hexdec( substr( $hex, 4, 2 ) );
+
+	// Expand shorthand (#abc) to six digits so the channel split below is correct.
+	if ( 3 === strlen( $hex ) ) {
+		$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+	}
+
+	$r = hexdec( substr( $hex, 0, 2 ) );
+	$g = hexdec( substr( $hex, 2, 2 ) );
+	$b = hexdec( substr( $hex, 4, 2 ) );
 
 	return sprintf( 'rgba(%d, %d, %d, %.2f)', $r, $g, $b, $opacity / 100 );
 }
@@ -357,7 +363,11 @@ function modal_templates_render_settings_page(): void {
 							step="0.5"
 							class="small-text"
 						>
-						<select name="modal_templates_styles[dialog_padding_unit]">
+						<select
+							id="mt-dialog-padding-unit"
+							name="modal_templates_styles[dialog_padding_unit]"
+							aria-label="<?php esc_attr_e( 'Padding unit', 'modal-templates' ); ?>"
+						>
 							<option value="rem" <?php selected( $dialog_padding_unit, 'rem' ); ?>>rem</option>
 							<option value="px" <?php selected( $dialog_padding_unit, 'px' ); ?>>px</option>
 						</select>

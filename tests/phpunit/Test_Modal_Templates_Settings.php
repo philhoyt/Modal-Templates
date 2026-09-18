@@ -57,4 +57,9 @@ class Test_Modal_Templates_Settings extends WP_UnitTestCase {
 		$this->assertSame( 'rgba(255, 255, 255, 1.00)', modal_templates_hex_to_rgba( '#ffffff', 100 ) );
 		$this->assertSame( 'rgba(17, 34, 51, 0.00)', modal_templates_hex_to_rgba( '#112233', 0 ) );
 	}
+
+	public function test_hex_to_rgba_expands_shorthand_hex(): void {
+		$this->assertSame( 'rgba(255, 255, 255, 0.60)', modal_templates_hex_to_rgba( '#fff', 60 ) );
+		$this->assertSame( 'rgba(170, 187, 204, 1.00)', modal_templates_hex_to_rgba( '#abc', 100 ) );
+	}
 }

@@ -6,6 +6,8 @@
  */
 
 /**
+ * Render filter tests.
+ *
  * @covers ::modal_templates_filter_modal_block
  */
 class Test_Modal_Templates_Render extends WP_UnitTestCase {

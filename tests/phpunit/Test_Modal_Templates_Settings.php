@@ -6,6 +6,8 @@
  */
 
 /**
+ * Settings sanitizer and CSS helper tests.
+ *
  * @covers ::modal_templates_sanitize_styles
  * @covers ::modal_templates_hex_to_rgba
  */

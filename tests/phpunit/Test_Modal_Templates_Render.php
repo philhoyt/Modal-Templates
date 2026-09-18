@@ -89,4 +89,58 @@ class Test_Modal_Templates_Render extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<span class="inner"', $output );
 		$this->assertStringNotContainsString( '<a class="inner"', $output );
 	}
+
+	public function test_self_referencing_modal_does_not_recurse(): void {
+		$slug = 'mt-self-ref';
+
+		// A modal template part whose content contains a trigger for itself.
+		$part_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_name'    => $slug,
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:button {"modalSlug":"' . $slug . '"} -->'
+					. '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Again</a></div>'
+					. '<!-- /wp:button -->',
+			)
+		);
+		wp_set_post_terms( $part_id, get_stylesheet(), 'wp_theme' );
+		wp_set_post_terms( $part_id, 'modal', 'wp_template_part_area' );
+
+		$block  = array(
+			'blockName' => 'core/button',
+			'attrs'     => array( 'modalSlug' => $slug ),
+		);
+		$output = modal_templates_filter_modal_block( self::BUTTON_HTML, $block );
+
+		// Outer trigger is pre-rendered once; the nested trigger is left plain.
+		$this->assertSame( 1, substr_count( $output, '<template id="mt-tpl-' ) );
+		$this->assertStringContainsString( '>Again</a>', $output );
+		$this->assertSame( 1, substr_count( $output, 'data-modal-content-id=' ) );
+	}
+
+	public function test_frontend_assets_enqueue_only_when_a_trigger_renders(): void {
+		wp_dequeue_style( 'modal-templates-frontend' );
+		wp_dequeue_script( 'modal-templates-frontend' );
+
+		modal_templates_filter_modal_block(
+			self::BUTTON_HTML,
+			array(
+				'blockName' => 'core/button',
+				'attrs'     => array(),
+			)
+		);
+		$this->assertFalse( wp_style_is( 'modal-templates-frontend', 'enqueued' ) );
+		$this->assertFalse( wp_script_is( 'modal-templates-frontend', 'enqueued' ) );
+
+		modal_templates_filter_modal_block(
+			self::BUTTON_HTML,
+			array(
+				'blockName' => 'core/button',
+				'attrs'     => array( 'modalSlug' => 'my-modal' ),
+			)
+		);
+		$this->assertTrue( wp_style_is( 'modal-templates-frontend', 'enqueued' ) );
+		$this->assertTrue( wp_script_is( 'modal-templates-frontend', 'enqueued' ) );
+	}
 }

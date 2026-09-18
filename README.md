@@ -16,7 +16,7 @@ Because rendering happens inside the `render_block` filter, it runs within the a
 - Site Editor integration — create and edit modal template parts within the editor; "Edit in Site Editor" link opens directly to the selected part.
 - Query Loop support — one template part, dynamic content per post.
 - Full accessibility — `role="dialog"`, `aria-modal`, `aria-labelledby` (dynamic from heading), `aria-expanded`, `aria-controls`, `aria-haspopup`, `inert` on background content, focus trap, focus return on close, ESC to close, iOS scroll lock.
-- Close animation — fade and slide out with mobile bottom-sheet variant; respects `prefers-reduced-motion`; pauses video/audio on close.
+- Close animation — fade and slide out; respects `prefers-reduced-motion`; pauses video/audio on close.
 - Width options — Small (480px), Medium (640px), Large (960px), Full, or Custom (set in Settings).
 - Settings page — Settings > Modal Templates lets non-developers adjust backdrop colour/opacity, dialog background, border radius, content padding, custom width, and close button colour.
 - CSS custom properties — every design token is a variable; theme CSS always wins over settings-page values.
@@ -57,6 +57,17 @@ window.ModalTemplates.open( triggerElement );
 
 // Close the currently open modal
 window.ModalTemplates.close();
+
+// Triggers are event-delegated, so markup added after page load works
+// automatically. bind() only refreshes the static ARIA attributes on
+// triggers inside a subtree (optional).
+window.ModalTemplates.bind( container );
+```
+
+The frontend script and stylesheet load only on pages where a trigger block renders. To load them everywhere (for example, when you output triggers from your own code):
+
+```php
+add_filter( 'modal_templates_force_enqueue_assets', '__return_true' );
 ```
 
 ## CSS Custom Properties
@@ -90,6 +101,11 @@ npm run format     # Auto-format JS/CSS
 ```
 
 ## Changelog
+
+### 1.1.1
+- Change: Confirmed compatible with WordPress 7.0.
+- Change: Updated the bundled update checker to 5.7.
+- Maintenance: Removed unused internal code and added an automated test and CI suite. No changes to plugin behaviour.
 
 ### 1.1.0
 - New: Group block modal triggers now convert nested links to spans, preventing invalid HTML and ensuring the whole group is reliably clickable.

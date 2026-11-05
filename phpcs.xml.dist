@@ -3,8 +3,10 @@
 	<description>WordPress Coding Standards for the Modal Templates plugin.</description>
 
 	<file>modal-templates.php</file>
+	<file>uninstall.php</file>
 	<file>includes</file>
 	<file>src</file>
+	<file>tests</file>
 
 	<arg name="basepath" value="."/>
 	<arg name="colors"/>
@@ -18,17 +20,16 @@
 	<exclude-pattern>node_modules/*</exclude-pattern>
 	<exclude-pattern>vendor/*</exclude-pattern>
 
-	<!-- render.php files are block template files included by WordPress with
-	     framework-injected variables ($attributes, $content, $block). The local
-	     variables derived from these are scoped to the template context and do not
-	     need plugin prefixes — this matches WordPress's own block render.php pattern. -->
-	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-		<exclude-pattern>src/*/render\.php</exclude-pattern>
-	</rule>
+	<rule ref="WordPress"/>
 
-	<rule ref="WordPress">
-		<!-- render.php files use $content which is pre-escaped block output. -->
-		<exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/>
+	<!-- Test classes follow the WP core test-suite conventions: descriptive
+	     method names stand in for per-test docblocks, and the bootstrap's
+	     _manually_load_plugin() is the name the core bootstrap expects. -->
+	<rule ref="Squiz.Commenting.FunctionComment.Missing">
+		<exclude-pattern>tests/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<exclude-pattern>tests/*</exclude-pattern>
 	</rule>
 
 	<rule ref="WordPress.WP.I18n">

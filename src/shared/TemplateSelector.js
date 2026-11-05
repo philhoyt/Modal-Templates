@@ -11,7 +11,7 @@
  * Pattern mirrors Ollie Menu Designer's TemplateSelector / useTemplateCreation.
  */
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	ComboboxControl,
@@ -24,6 +24,8 @@ import {
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as noticesStore } from '@wordpress/notices';
+import { speak } from '@wordpress/a11y';
 
 const MODAL_AREA = 'modal';
 
@@ -35,14 +37,15 @@ const MODAL_AREA = 'modal';
  * @return {string} Slug string.
  */
 function nameToSlug( name ) {
-	return (
-		'modal-' +
-		name
-			.toLowerCase()
-			.trim()
-			.replace( /[^a-z0-9]+/g, '-' )
-			.replace( /^-+|-+$/g, '' )
-	);
+	const base = name
+		.toLowerCase()
+		.trim()
+		.replace( /[^a-z0-9]+/g, '-' )
+		.replace( /^-+|-+$/g, '' );
+
+	// Names with no ASCII alphanumerics (e.g. "モーダル") would all collapse to
+	// "modal-"; fall back to a unique suffix instead of colliding.
+	return 'modal-' + ( base || Date.now().toString( 36 ) );
 }
 
 export default function TemplateSelector( { value, onChange } ) {
@@ -67,10 +70,22 @@ export default function TemplateSelector( { value, onChange } ) {
 	);
 
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	// Theme stylesheet slug — needed when opening the Site Editor.
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+
+	// Listing template parts only needs edit_posts, but creating/editing them
+	// needs edit_theme_options — hide the create/edit UI from users who lack it.
+	const canCreate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template_part',
+			} ),
 		[]
 	);
 
@@ -136,11 +151,21 @@ export default function TemplateSelector( { value, onChange } ) {
 				}, 500 );
 			}
 		} catch ( err ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				'Modal Templates: failed to create template part',
-				err
-			);
+			const message = err?.message
+				? sprintf(
+						/* translators: %s: error message from the REST API */
+						__(
+							'Could not create the modal template part: %s',
+							'modal-templates'
+						),
+						err.message
+					)
+				: __(
+						'Could not create the modal template part.',
+						'modal-templates'
+					);
+			createErrorNotice( message, { type: 'snackbar' } );
+			speak( message, 'assertive' );
 		} finally {
 			setIsCreating( false );
 		}
@@ -157,9 +182,9 @@ export default function TemplateSelector( { value, onChange } ) {
 	const selectedPart = modalParts.find( ( part ) => part.slug === value );
 	const editUrl = selectedPart
 		? `${ adminUrl }site-editor.php` +
-		  `?postType=wp_template_part` +
-		  `&postId=${ encodeURIComponent( selectedPart.id ) }` +
-		  `&canvas=edit`
+			`?postType=wp_template_part` +
+			`&postId=${ encodeURIComponent( selectedPart.id ) }` +
+			`&canvas=edit`
 		: null;
 
 	// ------------------------------------------------------------------ //
@@ -182,6 +207,7 @@ export default function TemplateSelector( { value, onChange } ) {
 						'The selected template part is rendered inside the modal when this trigger is clicked.',
 						'modal-templates'
 					) }
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				/>
 			) : (
@@ -192,14 +218,19 @@ export default function TemplateSelector( { value, onChange } ) {
 						margin: '0 0 8px',
 					} }
 				>
-					{ __(
-						'No modal template parts found. Create one below.',
-						'modal-templates'
-					) }
+					{ canCreate
+						? __(
+								'No modal template parts found. Create one below.',
+								'modal-templates'
+							)
+						: __(
+								'No modal template parts found. Ask an administrator to create one in the Site Editor.',
+								'modal-templates'
+							) }
 				</p>
 			) }
 
-			{ showNameInput ? (
+			{ canCreate && showNameInput && (
 				<div style={ { marginTop: '8px' } }>
 					<TextControl
 						ref={ nameInputRef }
@@ -222,6 +253,7 @@ export default function TemplateSelector( { value, onChange } ) {
 								? `slug: ${ nameToSlug( newName ) }`
 								: undefined
 						}
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
 					<div
@@ -250,7 +282,9 @@ export default function TemplateSelector( { value, onChange } ) {
 						</Button>
 					</div>
 				</div>
-			) : (
+			) }
+
+			{ canCreate && ! showNameInput && (
 				<div
 					style={ {
 						display: 'flex',

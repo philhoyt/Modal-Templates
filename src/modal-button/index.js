@@ -97,6 +97,7 @@ const withModalInspector = createHigherOrderComponent( ( BlockEdit ) => {
 								onChange={ ( value ) =>
 									setAttributes( { modalWidth: value } )
 								}
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 							/>
 						) }

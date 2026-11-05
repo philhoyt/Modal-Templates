@@ -8,7 +8,8 @@
 defined( 'ABSPATH' ) || exit;
 
 add_action( 'init', 'modal_templates_register_blocks' );
-add_action( 'wp_enqueue_scripts', 'modal_templates_enqueue_frontend_assets' );
+add_action( 'init', 'modal_templates_register_frontend_assets' );
+add_action( 'wp_enqueue_scripts', 'modal_templates_maybe_force_enqueue_frontend_assets' );
 add_action( 'enqueue_block_editor_assets', 'modal_templates_enqueue_editor_assets' );
 add_filter( 'render_block', 'modal_templates_filter_modal_block', 10, 2 );
 
@@ -19,30 +20,81 @@ add_filter( 'render_block', 'modal_templates_filter_modal_block', 10, 2 );
 function modal_templates_register_blocks(): void {}
 
 /**
- * Enqueue the frontend modal stylesheet and script.
+ * Register the frontend modal stylesheet and script.
+ *
+ * Registered early (init) so the handles exist for wp_add_inline_style() in
+ * settings.php; they are only enqueued when a trigger actually renders
+ * (see modal_templates_enqueue_frontend_assets()).
  */
-function modal_templates_enqueue_frontend_assets(): void {
-	wp_enqueue_style(
+function modal_templates_register_frontend_assets(): void {
+	wp_register_style(
 		'modal-templates-frontend',
 		MODAL_TEMPLATES_URL . 'assets/css/modal-frontend.css',
 		array(),
 		MODAL_TEMPLATES_VERSION
 	);
 
-	wp_enqueue_script(
+	wp_register_script(
 		'modal-templates-frontend',
 		MODAL_TEMPLATES_URL . 'assets/js/modal-frontend.js',
 		array(),
 		MODAL_TEMPLATES_VERSION,
 		true
 	);
+
+	wp_add_inline_script(
+		'modal-templates-frontend',
+		'window.modalTemplatesL10n = ' . wp_json_encode(
+			array(
+				'dialogLabel' => __( 'Modal', 'modal-templates' ),
+				'closeLabel'  => __( 'Close modal', 'modal-templates' ),
+			)
+		) . ';',
+		'before'
+	);
+}
+
+/**
+ * Enqueue the frontend modal stylesheet and script.
+ *
+ * Called from the render_block filter the first time a trigger renders, so
+ * pages without a modal trigger load nothing. In block themes the template is
+ * rendered before wp_head(), so the stylesheet still lands in <head>.
+ */
+function modal_templates_enqueue_frontend_assets(): void {
+	wp_enqueue_style( 'modal-templates-frontend' );
+	wp_enqueue_script( 'modal-templates-frontend' );
+}
+
+/**
+ * Optionally load the frontend assets on every page.
+ *
+ * Useful when triggers are output by code that bypasses render_block, or
+ * when window.ModalTemplates is driven programmatically on pages with no
+ * trigger block.
+ */
+function modal_templates_maybe_force_enqueue_frontend_assets(): void {
+	/**
+	 * Filter whether the modal assets load on every frontend page.
+	 *
+	 * @param bool $force Default false — assets load only when a trigger renders.
+	 */
+	if ( apply_filters( 'modal_templates_force_enqueue_assets', false ) ) {
+		modal_templates_enqueue_frontend_assets();
+	}
 }
 
 /**
  * Enqueue the block-editor extensions for core/button and core/group.
  */
 function modal_templates_enqueue_editor_assets(): void {
-	$asset_file = require MODAL_TEMPLATES_DIR . 'build/modal-button/index.asset.php';
+	$asset_path = MODAL_TEMPLATES_DIR . 'build/modal-button/index.asset.php';
+	if ( ! file_exists( $asset_path ) ) {
+		// Built assets are missing (fresh clone before `npm run build`) — skip
+		// rather than fatal in every editor screen.
+		return;
+	}
+	$asset_file = require $asset_path;
 
 	wp_enqueue_script(
 		'modal-templates-editor',
@@ -79,6 +131,9 @@ function modal_templates_enqueue_editor_assets(): void {
  * @return string
  */
 function modal_templates_filter_modal_block( string $block_content, array $block ): string {
+	// Slugs currently being pre-rendered further up the call stack.
+	static $rendering = array();
+
 	if ( ! in_array( $block['blockName'], array( 'core/button', 'core/group' ), true ) ) {
 		return $block_content;
 	}
@@ -87,6 +142,14 @@ function modal_templates_filter_modal_block( string $block_content, array $block
 	if ( ! $modal_slug ) {
 		return $block_content;
 	}
+
+	// A trigger inside a modal that points back at that same modal (directly
+	// or via a cycle) would recurse forever — leave it as a plain block.
+	if ( isset( $rendering[ $modal_slug ] ) ) {
+		return $block_content;
+	}
+
+	modal_templates_enqueue_frontend_assets();
 
 	$modal_width_raw = $block['attrs']['modalWidth'] ?? 'medium';
 	$modal_width     = in_array( $modal_width_raw, array( 'small', 'medium', 'large', 'full', 'custom' ), true )
@@ -125,9 +188,14 @@ function modal_templates_filter_modal_block( string $block_content, array $block
 	// Pre-render modal content into a <template> element                  //
 	// ------------------------------------------------------------------ //
 
+	$rendering[ $modal_slug ] = true;
 	ob_start();
-	block_template_part( $modal_slug );
-	$template_html = ob_get_clean();
+	try {
+		block_template_part( $modal_slug );
+	} finally {
+		$template_html = ob_get_clean();
+		unset( $rendering[ $modal_slug ] );
+	}
 
 	$modified .= sprintf(
 		'<template id="%s" class="mt-modal-prerendered">%s</template>',

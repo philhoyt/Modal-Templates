@@ -2,134 +2,146 @@
 
 [![CI](https://github.com/philhoyt/Modal-Templates/actions/workflows/ci.yml/badge.svg)](https://github.com/philhoyt/Modal-Templates/actions/workflows/ci.yml)
 
-Design modal contents as template parts in the Site Editor and attach them to any button or group block as a trigger.
+Build modal content as a template part in the Site Editor and open it from a core Button or Group block.
 
-## Description
+The plugin registers a "Modal" template part area and adds a Modal panel to the core Button and Group blocks. No custom blocks are registered. The chosen template part is rendered on the server inside the `render_block` filter and injected next to the trigger as a `<template>` element, so it runs in the current post context and works per post inside a Query Loop. The front-end script clones that template into a dialog shell on click; nothing is fetched when the modal opens.
 
-Modal Templates lets you design modal content as template parts in the Site Editor, then attach them to any Button or Group block. When a trigger is clicked, the pre-rendered template part opens in a modal shell.
-
-Because rendering happens inside the `render_block` filter, it runs within the active post context. A single template part can render dynamic, per-post content when used inside a Query Loop — each post gets its own pre-rendered modal with that post's data.
-
-## Features
-
-- Block editor native — extends core Button and Group blocks via `addFilter`.
-- Site Editor integration — create and edit modal template parts within the editor; "Edit in Site Editor" link opens directly to the selected part.
-- Query Loop support — one template part, dynamic content per post.
-- Full accessibility — `role="dialog"`, `aria-modal`, `aria-labelledby` (dynamic from heading), `aria-expanded`, `aria-controls`, `aria-haspopup`, `inert` on background content, focus trap, focus return on close, ESC to close, iOS scroll lock.
-- Close animation — fade and slide out; respects `prefers-reduced-motion`; pauses video/audio on close.
-- Width options — Small (480px), Medium (640px), Large (960px), Full, or Custom (set in Settings).
-- Settings page — Settings > Modal Templates lets non-developers adjust backdrop colour/opacity, dialog background, border radius, content padding, custom width, and close button colour.
-- CSS custom properties — every design token is a variable; theme CSS always wins over settings-page values.
+The dialog uses `role="dialog"`, `aria-modal`, and `aria-labelledby` (from the first heading in the content). The trigger gets `aria-expanded`, `aria-controls`, and `aria-haspopup`. While open, background content is `inert`, Tab is trapped inside the dialog, and body scroll is locked (including on iOS). Escape, the backdrop, and the close button all close it; focus returns to the trigger, and any video or audio inside the modal is paused. The close animation is skipped under `prefers-reduced-motion`.
 
 ## Requirements
 
-- WordPress 6.4+
-- PHP 8.1+
-- A block theme (required for template parts and the Site Editor)
+- WordPress 6.4 or later
+- PHP 8.1 or later
+- A block theme. Template parts and the Site Editor are not available in classic themes.
 
 ## Installation
 
-1. Go to the [latest release on GitHub](https://github.com/philhoyt/Modal-Templates/releases/latest) and download the `modal-templates.zip` asset.
-2. In your WordPress admin, go to **Plugins > Add New Plugin > Upload Plugin**.
-3. Choose the downloaded `.zip` file and click **Install Now**.
-4. Click **Activate Plugin**.
-5. Optionally adjust styles at **Settings > Modal Templates**.
+1. Download `modal-templates.zip` from the [latest release](https://github.com/philhoyt/Modal-Templates/releases/latest).
+2. In the WordPress admin, go to Plugins > Add New Plugin > Upload Plugin.
+3. Choose the zip, click Install Now, then Activate Plugin.
+
+The plugin checks GitHub releases for updates with Plugin Update Checker, so later versions show up on the Plugins screen.
 
 ## Usage
 
-### Create a modal template part
-
-In the block editor, select a Button or Group block and open the **Modal** panel in the inspector sidebar. Click **+ New modal template**, give it a name, and it opens in the Site Editor ready to edit.
-
-### Attach a modal to a trigger
-
 1. Select a Button or Group block.
-2. Open the **Modal** panel in the inspector.
-3. Choose a template part from the dropdown.
-4. Set a width (defaults to Medium).
+2. Open the Modal panel in the block sidebar.
+3. Pick a modal template part from the list, or click "+ New modal template", enter a name, and edit the new part in the Site Editor. The create button and the "Edit in Site Editor" link appear only for users who can create template parts.
+4. Set a width: Small (480px), Medium (640px, the default), Large (960px), Full, or Custom.
 
-On the frontend, clicking the button or group opens the modal with that template part's rendered content.
+On the front end, clicking the block opens the modal. A Button trigger with a link URL opens the modal instead of following the link. Inside a Group trigger, any `<a>` is replaced with `<span>` so the group does not contain nested links.
 
-### Programmatic control
-```js
-// Open the modal for any element that has data-modal-content-id set
-window.ModalTemplates.open( triggerElement );
-
-// Close the currently open modal
-window.ModalTemplates.close();
-
-// Triggers are event-delegated, so markup added after page load works
-// automatically. bind() only refreshes the static ARIA attributes on
-// triggers inside a subtree (optional).
-window.ModalTemplates.bind( container );
-```
-
-The frontend script and stylesheet load only on pages where a trigger block renders. To load them everywhere (for example, when you output triggers from your own code):
+The front-end script and stylesheet are enqueued only on pages where a trigger renders. If you print triggers from your own code, load them on every page:
 
 ```php
 add_filter( 'modal_templates_force_enqueue_assets', '__return_true' );
 ```
 
-## CSS Custom Properties
+### JavaScript API
 
-Override any of these in your theme stylesheet. Site admins can adjust the most common ones via **Settings > Modal Templates**.
+```js
+// Open the modal for any element that has data-modal-content-id set.
+window.ModalTemplates.open( triggerElement );
 
-| Property | Default | Notes |
+// Close the open modal.
+window.ModalTemplates.close();
+
+// Refresh the static ARIA attributes on triggers inside a container.
+// Clicks are delegated, so markup added after page load already works.
+window.ModalTemplates.bind( container );
+```
+
+## Configuration
+
+Settings > Modal Templates sets the backdrop colour and opacity, dialog background, border radius, content padding (rem or px), custom width (200-3000px), and close button colour. The page writes these values as CSS custom properties on `:root`, and a rule in your theme stylesheet overrides any of them.
+
+| Property | Default | Set from Settings |
 |---|---|---|
-| `--mt-backdrop-color` | `rgba(0, 0, 0, 0.6)` | Set via Settings (colour + opacity) |
-| `--mt-dialog-bg` | `#fff` | Set via Settings |
-| `--mt-dialog-radius` | `8px` | Set via Settings |
-| `--mt-dialog-shadow` | `0 20px 60px rgba(0, 0, 0, 0.3)` | Developer override only |
-| `--mt-dialog-padding` | `2rem` | Set via Settings |
-| `--mt-dialog-width-custom` | `800px` | Set via Settings; used when width = Custom |
-| `--mt-close-color` | `#555` | Set via Settings |
-| `--mt-close-bg-hover` | `#f0f0f0` | Developer override only |
-| `--mt-z-index` | `99999` | Developer override only |
+| `--mt-backdrop-color` | `rgba(0, 0, 0, 0.6)` | Yes (colour and opacity) |
+| `--mt-dialog-bg` | `#fff` | Yes |
+| `--mt-dialog-radius` | `8px` | Yes |
+| `--mt-dialog-shadow` | `0 20px 60px rgba(0, 0, 0, 0.3)` | No |
+| `--mt-dialog-padding` | `2rem` | Yes |
+| `--mt-dialog-width-custom` | `800px` | Yes, used when width is Custom |
+| `--mt-close-color` | `#555` | Yes |
+| `--mt-close-bg-hover` | `#f0f0f0` | No |
+| `--mt-z-index` | `99999` | No |
 
-Theme CSS always takes precedence over settings-page values.
+Deleting the plugin removes the `modal_templates_styles` option. Modal template parts are ordinary template parts and are left in place.
 
 ## Development
+
 ```bash
 npm install
-npm run build      # Production build
-npm run start      # Watch mode
-npm run lint       # JS + CSS + PHP
-npm run lint:js
-npm run lint:css
-npm run lint:php
-npm run format     # Auto-format JS/CSS
+composer install        # also copies Plugin Update Checker into lib/
+
+npm start               # webpack watch
+npm run build           # production build to build/modal-button/
+npm run lint            # lint:js, lint:css, and phpcs
+npm run format          # wp-scripts format
+
+composer run lint       # phpcs
+composer run analyse    # phpstan
+npm run test:unit       # Vitest (wp-scripts test-unit-js)
+
+npm run env:start       # wp-env
+npm run test:php        # PHPUnit inside wp-env
+npm run test:e2e        # Playwright specs in specs/
+npm run i18n            # regenerate languages/modal-templates.pot, .mo, and .json
+npm run plugin-zip      # build modal-templates.zip
 ```
+
+CI runs phpcs and phpstan on PHP 8.1 through 8.4, lints and builds the JS, and runs PHPUnit and Playwright against wp-env.
+
+## Releases
+
+Bump the version in `modal-templates.php` (header and `MODAL_TEMPLATES_VERSION`), `readme.txt` (Stable tag and changelog), `package.json`, and the changelog in this file. Then push a lowercase `v` tag:
+
+```bash
+git tag v1.2.0 && git push origin v1.2.0
+```
+
+The release workflow builds the assets, runs `wp-scripts plugin-zip`, pulls the matching `= X.Y.Z =` section out of `readme.txt` for the release notes, and attaches `modal-templates.zip` and `readme.txt` to the GitHub release. The tag must start with a lowercase `v`: Plugin Update Checker strips the prefix case-sensitively, so an uppercase `V` tag is never offered as an update.
+
+## Limitations
+
+- Classic themes are not supported.
+- A template part that contains a trigger for itself is rendered as a plain block rather than a modal, to avoid infinite recursion.
+- One modal shell is used per page. Opening a trigger inside an open modal swaps the content rather than stacking a second dialog.
 
 ## Changelog
 
 ### 1.2.0
-- Add: The button to create a modal template part, and the link to edit one in the Site Editor, are shown only to users who are allowed to create template parts. When creating a template part fails, an error notice is shown instead of nothing happening.
-- Fix: Triggers added to the page after it loads, including triggers inside modal content, now open their modal. A button trigger with a link URL now opens the modal instead of following the link.
-- Fix: Focus moves into the modal on open and returns to the trigger on close, and closing the modal no longer removes the inert attribute from elements that another script set.
-- Fix: A modal template part that contains a trigger for itself no longer recurses until the page fails to load.
-- Fix: Front-end styles and script load only on pages that contain a modal trigger. The modal_templates_force_enqueue_assets filter loads them on every page.
-- Fix: Three-digit hex colours such as #fff in the style settings now render the correct colour.
-- Fix: The padding unit select on the settings page now has an accessible label.
-- Change: Tested up to WordPress 7.1.
+- Added a permission check so the create button and the Site Editor link appear only for users who can create template parts.
+- Added an error notice when creating a template part fails.
+- Fixed triggers added after page load, including triggers inside modal content, so they open their modal.
+- Fixed Button triggers with a link URL to open the modal instead of following the link.
+- Fixed focus handling: focus moves into the modal on open and returns to the trigger on close.
+- Fixed closing the modal so it no longer removes an `inert` attribute set by another script.
+- Fixed a template part that contains a trigger for itself so it no longer recurses until the page fails.
+- Fixed front-end assets to load only on pages that contain a modal trigger. Added the `modal_templates_force_enqueue_assets` filter to load them everywhere.
+- Fixed three-digit hex colours such as `#fff` in the style settings.
+- Fixed the missing accessible label on the padding unit select.
+- Tested up to WordPress 7.1.
 
 ### 1.1.1
-- Change: Confirmed compatible with WordPress 7.0.
-- Change: Updated the bundled update checker to 5.7.
-- Maintenance: Removed unused internal code and added an automated test and CI suite. No changes to plugin behaviour.
+- Tested up to WordPress 7.0.
+- Updated the bundled Plugin Update Checker to 5.7.
+- Removed unused internal code and added PHPUnit, Playwright, and CI. No change to plugin behaviour.
 
 ### 1.1.0
-- New: Group block modal triggers now convert nested links to spans, preventing invalid HTML and ensuring the whole group is reliably clickable.
-- New: Automatic update notifications via GitHub releases.
+- Changed Group triggers to replace nested links with spans so the group markup is valid and the whole group is clickable.
+- Added update checks against GitHub releases.
 
 ### 1.0.2
-- Fix: Prevent layout shift caused by scrollbar disappearing when a modal opens on Windows.
+- Fixed a layout shift on Windows when the scrollbar disappears as a modal opens.
 
 ### 1.0.1
-- Fix: Modal now centres on screen on mobile instead of appearing at the bottom.
+- Fixed the modal on mobile so it centres on screen instead of sitting at the bottom.
 
 ### 1.0.0
 - Initial release.
 
 ## License
 
-GPL-2.0-or-later. See [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)
+GPL-2.0-or-later. See [gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html).

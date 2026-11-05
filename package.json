@@ -27,7 +27,7 @@
     "i18n:json": "wp i18n make-json languages/ --no-purge",
     "i18n": "npm run i18n:pot && npm run i18n:mo && npm run i18n:json",
     "plugin-zip": "wp-scripts plugin-zip",
-    "test:unit": "wp-scripts test-unit-js",
+    "test:unit": "wp-scripts test-unit-js --passWithNoTests",
     "test:e2e": "wp-scripts test-playwright",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
@@ -35,7 +35,9 @@
     "test:php": "wp-env run tests-cli --env-cwd wp-content/plugins/modal-templates -- vendor/bin/phpunit"
   },
   "devDependencies": {
-    "@wordpress/env": "^11.15.0",
-    "@wordpress/scripts": "^35.0.0"
+    "@wordpress/env": "^12.1.0",
+    "@wordpress/scripts": "^37.1.0",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
   }
 }

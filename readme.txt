@@ -3,7 +3,7 @@ Contributors: philhoyt
 Tags: modal, popup, block editor, gutenberg, template parts
 Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 Requires PHP: 8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -125,6 +125,16 @@ Override any of these in your theme stylesheet. Site admins can adjust the most 
 * `--mt-z-index` — stacking order (default: 99999)
 
 == Changelog ==
+
+= 1.2.0 =
+* Add: The button to create a modal template part, and the link to edit one in the Site Editor, are shown only to users who are allowed to create template parts. When creating a template part fails, an error notice is shown instead of nothing happening.
+* Fix: Triggers added to the page after it loads, including triggers inside modal content, now open their modal. A button trigger with a link URL now opens the modal instead of following the link.
+* Fix: Focus moves into the modal on open and returns to the trigger on close, and closing the modal no longer removes the inert attribute from elements that another script set.
+* Fix: A modal template part that contains a trigger for itself no longer recurses until the page fails to load.
+* Fix: Front-end styles and script load only on pages that contain a modal trigger. The modal_templates_force_enqueue_assets filter loads them on every page.
+* Fix: Three-digit hex colours such as #fff in the style settings now render the correct colour.
+* Fix: The padding unit select on the settings page now has an accessible label.
+* Change: Tested up to WordPress 7.1.
 
 = 1.1.1 =
 * Change: Confirmed compatible with WordPress 7.0.

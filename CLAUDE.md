@@ -2,7 +2,7 @@
 
 Block-based modal plugin for WordPress. Modals are designed as template parts in the Site Editor and attached to core/button or core/group triggers. Works inside Query Loops via inline pre-rendering.
 
-- **Plugin**: `modal-templates` | v1.2.0 | Requires WP 6.4+, PHP 8.1+
+- **Plugin**: `modal-templates` | v1.2.1 | Requires WP 6.4+, PHP 8.1+
 - **Text domain**: `modal-templates`
 - **GitHub**: https://github.com/philhoyt/Modal-Templates
 

@@ -111,6 +111,11 @@ The release workflow builds the assets, runs `wp-scripts plugin-zip`, pulls the 
 
 ## Changelog
 
+### 1.2.1
+- Fixed the update checker so it always installs the release zip, not whichever file GitHub lists first.
+- Fixed the plugin zip so it ships the languages folder.
+- Rewrote the readme files in plain English.
+
 ### 1.2.0
 - Added a permission check so the create button and the Site Editor link appear only for users who can create template parts.
 - Added an error notice when creating a template part fails.

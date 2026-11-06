@@ -3,7 +3,7 @@ Contributors: philhoyt
 Tags: modal, popup, block editor, gutenberg, template parts
 Requires at least: 6.4
 Tested up to: 7.1
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 Requires PHP: 8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -117,6 +117,11 @@ Deleting the plugin removes the `modal_templates_styles` option. Modal template 
 2. A modal open on the front end, showing a team member bio triggered from a Query Loop.
 
 == Changelog ==
+
+= 1.2.1 =
+* Fixed the update checker so it always installs the release zip, not whichever file GitHub lists first.
+* Fixed the plugin zip so it ships the languages folder.
+* Rewrote the readme files in plain English.
 
 = 1.2.0 =
 * Added a permission check so the create button and the Site Editor link appear only for users who can create template parts.

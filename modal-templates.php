@@ -34,6 +34,11 @@ if ( file_exists( MODAL_TEMPLATES_DIR . 'lib/plugin-update-checker/plugin-update
 	);
 	$modal_templates_vcs_api        = $modal_templates_update_checker->getVcsApi();
 	if ( method_exists( $modal_templates_vcs_api, 'enableReleaseAssets' ) ) {
-		$modal_templates_vcs_api->enableReleaseAssets();
+		// Only a .zip asset counts, and a release without one is skipped. The
+		// default PREFER_RELEASE_ASSETS falls back to GitHub's source archive,
+		// which installs as <Repo>-<tag>/ and breaks the plugin directory.
+		// Without the filter the first asset wins, GitHub lists assets by name,
+		// so an asset named ahead of modal-templates.zip would be installed (PCLZIP_ERR_BAD_FORMAT).
+		$modal_templates_vcs_api->enableReleaseAssets( '/\.zip$/', $modal_templates_vcs_api::REQUIRE_RELEASE_ASSETS );
 	}
 }
